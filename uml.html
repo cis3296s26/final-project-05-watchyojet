@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WatchyoJet – UML Diagrams</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;padding:40px 24px}
+header{text-align:center;margin-bottom:48px}
+header h1{font-size:2rem;color:#60a5fa;letter-spacing:2px}
+header p{color:#94a3b8;margin-top:6px;font-size:.95rem}
+.section{max-width:900px;margin:0 auto 64px auto}
+.section h2{font-size:1.15rem;color:#38bdf8;border-left:4px solid #38bdf8;padding-left:12px;margin-bottom:24px;text-transform:uppercase;letter-spacing:1px}
+.diagram-box{background:#1e2330;border:1px solid #2d3748;border-radius:12px;padding:32px 24px;overflow-x:auto;display:flex;justify-content:center}
+
+/* ── shared UML box styles ── */
+.uml-col{display:flex;flex-direction:column;align-items:center;gap:0}
+.arrow-down{width:2px;height:36px;background:#475569;margin:0 auto}
+.arrow-down-label{color:#64748b;font-size:.7rem;text-align:center;margin:4px 0}
+.arrow-head{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid #475569;margin:0 auto}
+
+/* architecture boxes */
+.arch-box{
+  border:2px solid #334155;border-radius:8px;min-width:320px;max-width:360px;
+  overflow:hidden;font-size:.82rem;
+}
+.arch-box .arch-title{padding:10px 16px;font-weight:700;text-align:center;border-bottom:1px solid #334155}
+.arch-box .arch-body{padding:8px 16px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.76rem;line-height:1.6;color:#94a3b8}
+
+.arch-box.frontend{border-color:#60a5fa}.arch-box.frontend .arch-title{background:#1e3a5f;color:#93c5fd}
+.arch-box.backend{border-color:#a78bfa}.arch-box.backend .arch-title{background:#2e1065;color:#c4b5fd}
+.arch-box.engine{border-color:#34d399}.arch-box.engine .arch-title{background:#052e16;color:#86efac}
+.arch-box.sim{border-color:#fbbf24}.arch-box.sim .arch-title{background:#422006;color:#fcd34d}
+.arch-box.data{border-color:#f87171}.arch-box.data .arch-title{background:#450a0a;color:#fca5a5}
+
+/* class diagram boxes */
+.class-grid{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
+.cls{
+  border:2px solid #22c55e;border-radius:6px;min-width:230px;max-width:270px;
+  font-size:.78rem;overflow:hidden;background:#1a2332;
+}
+.cls .cls-name{padding:8px 12px;text-align:center;font-weight:700;background:#052e16;color:#86efac;border-bottom:1px solid #1e293b}
+.cls .cls-attrs{padding:6px 10px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.72rem;line-height:1.55;color:#cbd5e1;border-bottom:1px solid #1e293b}
+.cls .cls-methods{padding:6px 10px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.72rem;line-height:1.55;color:#93c5fd}
+.cls .cls-attrs:empty,.cls .cls-methods:empty{display:none}
+
+/* sequence diagram */
+.seq-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:8px 0;font-size:.82rem;width:100%}
+.seq-step{
+  display:flex;align-items:center;gap:14px;padding:10px 16px;width:100%;
+}
+.seq-num{
+  width:28px;height:28px;border-radius:50%;background:#1e3a5f;color:#60a5fa;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0;
+}
+.seq-label{color:#e2e8f0}
+.seq-label .caller{color:#93c5fd;font-family:'Cascadia Code','Fira Code',monospace;font-size:.78rem}
+.seq-divider{
+  width:100%;padding:8px 16px;margin:4px 0;
+}
+.seq-divider span{
+  display:inline-block;padding:4px 12px;border-radius:4px;font-size:.75rem;font-weight:600;
+  background:#422006;color:#fbbf24;
+}
+.seq-arrow{width:2px;height:20px;background:#334155;margin-left:29px}
+
+/* state diagram */
+.state-flow{display:flex;flex-direction:column;align-items:center;gap:0}
+.state-node{
+  padding:10px 28px;border-radius:24px;font-weight:600;font-size:.85rem;
+  border:2px solid #334155;text-align:center;min-width:180px;
+}
+.state-node.normal{border-color:#22c55e;color:#86efac;background:#052e16}
+.state-node.conflict{border-color:#ef4444;color:#fca5a5;background:#450a0a}
+.state-node.adjusting{border-color:#fbbf24;color:#fcd34d;background:#422006}
+.state-edge{color:#64748b;font-size:.75rem;font-style:italic;margin:2px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#9992; WatchyoJet</h1>
+  <p>Autonomous Air Traffic Control Decision System — UML Diagrams</p>
+</header>
+
+<!-- ═══════════════════════════════════
+     1. SYSTEM ARCHITECTURE
+═══════════════════════════════════ -->
+<div class="section">
+  <h2>1 &mdash; System Architecture</h2>
+  <div class="diagram-box">
+    <div class="uml-col">
+
+      <div class="arch-box frontend">
+        <div class="arch-title">Frontend (Web UI)</div>
+        <div class="arch-body">- Leaflet Map<br>- Displays Aircraft<br>- Displays AoR</div>
+      </div>
+
+      <div class="arrow-down"></div>
+      <div class="arrow-down-label">REST / WebSocket</div>
+      <div class="arrow-head"></div>
+
+      <div class="arch-box backend">
+        <div class="arch-title">Backend (Spring Boot)</div>
+        <div class="arch-body">AircraftController<br>AoRController<br>SimulationController</div>
+      </div>
+
+      <div class="arrow-down"></div>
+      <div class="arrow-head"></div>
+
+      <div class="arch-box engine">
+        <div class="arch-title">ATC Decision Engine</div>
+        <div class="arch-body">ConflictDetector<br>TrajectoryPredictor<br>ResolutionEngine</div>
+      </div>
+
+      <div class="arrow-down"></div>
+      <div class="arrow-head"></div>
+
+      <div class="arch-box sim">
+        <div class="arch-title">Simulation Engine</div>
+        <div class="arch-body">AircraftManager<br>MovementEngine</div>
+      </div>
+
+      <div class="arrow-down"></div>
+      <div class="arrow-head"></div>
+
+      <div class="arch-box data">
+        <div class="arch-title">Data Layer</div>
+        <div class="arch-body">In-Memory / Database</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     2. CLASS DIAGRAM  (SVG with relationships)
+═══════════════════════════════════ -->
+<div class="section">
+  <h2>2 &mdash; Class Diagram (Core System)</h2>
+  <div class="diagram-box">
+    <svg viewBox="0 0 860 720" width="860" height="720" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">
+      <defs>
+        <!-- arrow markers -->
+        <marker id="arrOpen" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
+        </marker>
+        <marker id="arrFill" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#60a5fa"/>
+        </marker>
+        <marker id="diamond" viewBox="0 0 12 12" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+          <path d="M0,6 L6,0 L12,6 L6,12 Z" fill="#60a5fa"/>
+        </marker>
+        <marker id="diamondOpen" viewBox="0 0 12 12" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+          <path d="M0,6 L6,0 L12,6 L6,12 Z" fill="#1e2330" stroke="#60a5fa" stroke-width="1.5"/>
+        </marker>
+      </defs>
+
+      <!-- ── ATCDecisionEngine (top center) ── -->
+      <rect x="290" y="20" width="280" height="70" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="2"/>
+      <text x="430" y="42" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">ATCDecisionEngine</text>
+      <line x1="290" y1="52" x2="570" y2="52" stroke="#1e293b"/>
+      <text x="430" y="72" text-anchor="middle" fill="#93c5fd" font-family="Cascadia Code, Fira Code, monospace" font-size="11">+ runCycle() : void</text>
+
+      <!-- ── ConflictDetector (left) ── -->
+      <rect x="20" y="180" width="230" height="70" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="2"/>
+      <text x="135" y="202" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">ConflictDetector</text>
+      <line x1="20" y1="212" x2="250" y2="212" stroke="#1e293b"/>
+      <text x="135" y="232" text-anchor="middle" fill="#93c5fd" font-family="Cascadia Code, Fira Code, monospace" font-size="11">+ detectConflicts() : List&lt;Conflict&gt;</text>
+
+      <!-- ── TrajectoryPredictor (center) ── -->
+      <rect x="280" y="180" width="240" height="70" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="2"/>
+      <text x="400" y="202" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">TrajectoryPredictor</text>
+      <line x1="280" y1="212" x2="520" y2="212" stroke="#1e293b"/>
+      <text x="400" y="232" text-anchor="middle" fill="#93c5fd" font-family="Cascadia Code, Fira Code, monospace" font-size="11">+ predictPosition() : Position</text>
+
+      <!-- ── ResolutionEngine (right) ── -->
+      <rect x="560" y="180" width="240" height="70" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="2"/>
+      <text x="680" y="202" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">ResolutionEngine</text>
+      <line x1="560" y1="212" x2="800" y2="212" stroke="#1e293b"/>
+      <text x="680" y="232" text-anchor="middle" fill="#93c5fd" font-family="Cascadia Code, Fira Code, monospace" font-size="11">+ resolveConflict() : Resolution</text>
+
+      <!-- ── AircraftManager (center below) ── -->
+      <rect x="270" y="370" width="280" height="90" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="2"/>
+      <text x="410" y="392" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">AircraftManager</text>
+      <line x1="270" y1="402" x2="550" y2="402" stroke="#1e293b"/>
+      <text x="280" y="422" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">aircrafts : List&lt;Aircraft&gt;</text>
+      <line x1="270" y1="432" x2="550" y2="432" stroke="#1e293b"/>
+      <text x="280" y="452" fill="#93c5fd" font-family="Cascadia Code, Fira Code, monospace" font-size="11">+ updatePositions() : void</text>
+
+      <!-- ── Aircraft (bottom center) ── -->
+      <rect x="290" y="560" width="240" height="140" rx="5" fill="#1a2332" stroke="#22c55e" stroke-width="2"/>
+      <text x="410" y="582" text-anchor="middle" fill="#86efac" font-weight="700" font-size="14">Aircraft</text>
+      <line x1="290" y1="592" x2="530" y2="592" stroke="#1e293b"/>
+      <text x="300" y="612" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">callsign : String</text>
+      <text x="300" y="628" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">lat : double</text>
+      <text x="300" y="644" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">lon : double</text>
+      <text x="300" y="660" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">altitude : double</text>
+      <text x="300" y="676" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">speed : double</text>
+      <text x="300" y="692" fill="#cbd5e1" font-family="Cascadia Code, Fira Code, monospace" font-size="11">heading : double</text>
+
+      <!-- ═══ RELATIONSHIP LINES ═══ -->
+
+      <!-- ATCDecisionEngine --> ConflictDetector  (uses) -->
+      <line x1="330" y1="90" x2="135" y2="180" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrOpen)"/>
+      <text x="200" y="128" fill="#64748b" font-size="11" font-style="italic">uses</text>
+
+      <!-- ATCDecisionEngine --> TrajectoryPredictor  (uses) -->
+      <line x1="430" y1="90" x2="400" y2="180" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrOpen)"/>
+      <text x="425" y="140" fill="#64748b" font-size="11" font-style="italic">uses</text>
+
+      <!-- ATCDecisionEngine --> ResolutionEngine  (uses) -->
+      <line x1="530" y1="90" x2="680" y2="180" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrOpen)"/>
+      <text x="620" y="128" fill="#64748b" font-size="11" font-style="italic">uses</text>
+
+      <!-- ATCDecisionEngine --> AircraftManager (depends) -->
+      <line x1="430" y1="90" x2="410" y2="370" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrOpen)"/>
+      <text x="440" y="240" fill="#64748b" font-size="11" font-style="italic">reads from</text>
+
+      <!-- ConflictDetector --> Aircraft (reads) dashed -->
+      <line x1="80" y1="250" x2="310" y2="560" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrOpen)"/>
+      <text x="130" y="410" fill="#64748b" font-size="11" font-style="italic">checks positions</text>
+
+      <!-- TrajectoryPredictor --> Aircraft (reads) dashed -->
+      <line x1="400" y1="250" x2="400" y2="370" stroke="#60a5fa" stroke-width="0" />
+      <line x1="500" y1="250" x2="490" y2="560" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrOpen)"/>
+      <text x="510" y="410" fill="#64748b" font-size="11" font-style="italic">predicts</text>
+
+      <!-- AircraftManager ◆--* Aircraft (composition) -->
+      <line x1="410" y1="460" x2="410" y2="560" stroke="#60a5fa" stroke-width="2" marker-start="url(#diamond)"/>
+      <text x="420" y="518" fill="#64748b" font-size="11" font-style="italic">1 manages *</text>
+
+      <!-- ResolutionEngine --> Aircraft (modifies) dashed -->
+      <line x1="680" y1="250" x2="520" y2="560" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrOpen)"/>
+      <text x="630" y="420" fill="#64748b" font-size="11" font-style="italic">modifies heading/alt</text>
+
+      <!-- ═══ LEGEND ═══ -->
+      <rect x="20" y="560" width="200" height="100" rx="6" fill="#151b28" stroke="#2d3748"/>
+      <text x="30" y="580" fill="#94a3b8" font-size="10" font-weight="600">LEGEND</text>
+      <line x1="30" y1="600" x2="70" y2="600" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrOpen)"/>
+      <text x="80" y="604" fill="#94a3b8" font-size="10">Association (uses)</text>
+      <line x1="30" y1="620" x2="70" y2="620" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrOpen)"/>
+      <text x="80" y="624" fill="#94a3b8" font-size="10">Dependency (reads)</text>
+      <line x1="30" y1="640" x2="70" y2="640" stroke="#60a5fa" stroke-width="2" marker-start="url(#diamond)"/>
+      <text x="80" y="644" fill="#94a3b8" font-size="10">Composition (owns)</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     3. SEQUENCE DIAGRAM
+═══════════════════════════════════ -->
+<div class="section">
+  <h2>3 &mdash; Sequence Diagram (Decision Cycle)</h2>
+  <div class="diagram-box">
+    <div class="seq-wrap">
+
+      <div class="seq-step">
+        <div class="seq-num">1</div>
+        <div class="seq-label">User / System Timer triggers cycle</div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">2</div>
+        <div class="seq-label"><span class="caller">SimulationEngine.updatePositions()</span></div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">3</div>
+        <div class="seq-label"><span class="caller">ATCDecisionEngine.runCycle()</span></div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">4</div>
+        <div class="seq-label"><span class="caller">ConflictDetector.detectConflicts()</span></div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-divider"><span>IF conflict detected</span></div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">5</div>
+        <div class="seq-label"><span class="caller">ResolutionEngine.resolveConflict()</span></div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">6</div>
+        <div class="seq-label">Update Aircraft states</div>
+      </div>
+      <div class="seq-arrow"></div>
+
+      <div class="seq-step">
+        <div class="seq-num">7</div>
+        <div class="seq-label">Send data &rarr; Frontend</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     4. STATE DIAGRAM
+═══════════════════════════════════ -->
+<div class="section">
+  <h2>4 &mdash; State Diagram (Aircraft Conflict Lifecycle)</h2>
+  <div class="diagram-box">
+    <div class="state-flow">
+
+      <div class="state-node normal">Normal Flight</div>
+      <div class="arrow-down"></div>
+      <div class="state-edge">conflict detected</div>
+      <div class="arrow-head"></div>
+
+      <div class="state-node conflict">Conflict State</div>
+      <div class="arrow-down"></div>
+      <div class="state-edge">resolution issued</div>
+      <div class="arrow-head"></div>
+
+      <div class="state-node adjusting">Adjusting (turn / climb)</div>
+      <div class="arrow-down"></div>
+      <div class="state-edge">separation achieved</div>
+      <div class="arrow-head"></div>
+
+      <div class="state-node normal">Normal Flight</div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
