@@ -3,7 +3,7 @@
 
 WatchyoJet is a web-based autonomous air traffic controller decision system designed to manage complex operations, maintain aircraft separation, and optimize runway usage. By replacing traditional, human-centric ATC systems with an autonomous system, WatchyoJet automates the decision-making process to reduce human workload and prevent unforeseen errors. The system takes into account aircraft headings, altitude, speed, distance from the airport, runway availability, and weather forecasts to devise real-time, conflict-free ATC commands using priority-queue, constraint-based scheduling. 
 
-![Proof Of Concept GUI:](GUI.jpg)
+![Proof Of Concept GUI:](POC.jpg)
 
 ## How to run
 1. Download the latest release package from the **Releases** section on the right side of this GitHub page.
