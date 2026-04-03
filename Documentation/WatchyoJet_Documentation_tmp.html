@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WatchyoJet_Documentation.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E2%9C%88%EF%B8%8F-watchyojet--autonomous-air-traffic-control-decision-system">✈️ WatchyoJet — Autonomous Air Traffic Control Decision System</h1>
+<blockquote>
+<p><strong>A modular, rule-based ATC simulation engine designed for conflict detection, resolution, and autonomous flight management.</strong></p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-system-overview">System Overview</a></li>
+<li><a href="#2-currently-implemented-system">Currently Implemented System</a></li>
+<li><a href="#3-recent-improvements">Recent Improvements</a></li>
+<li><a href="#4-current-limitations">Current Limitations</a></li>
+<li><a href="#5-future-architecture">Future Architecture</a></li>
+<li><a href="#6-future-features">Future Features</a></li>
+<li><a href="#7-diagrams">Diagrams</a></li>
+<li><a href="#8-engineering-quality--standards">Engineering Quality &amp; Standards</a></li>
+</ol>
+<hr>
+<h2 id="1-system-overview">1. System Overview</h2>
+<p><strong>WatchyoJet</strong> is an autonomous Air Traffic Control (ATC) system that simulates aircraft movement, detects spatial conflicts between aircraft, and resolves them using deterministic, priority-based decision logic — all without human intervention.</p>
+<p>The system is engineered around a clean, unidirectional processing pipeline:</p>
+<pre class="hljs"><code><div>┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│   [ Simulation ]  →  [ Detection ]  →  [ Resolution ]  →  [ Update ] │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Simulation</strong></td>
+<td>Maintain aircraft state; advance positions over time</td>
+</tr>
+<tr>
+<td><strong>Detection</strong></td>
+<td>Identify pairwise conflicts using spatial proximity rules</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Apply rule-based logic to resolve identified conflicts</td>
+</tr>
+<tr>
+<td><strong>Update</strong></td>
+<td>Commit resolved states back to the simulation</td>
+</tr>
+</tbody>
+</table>
+<p>WatchyoJet is designed to evolve into a <strong>real-time, production-grade ATC assistance platform</strong> — extensible toward live data feeds, trajectory prediction, and full-stack web visualization.</p>
+<hr>
+<h2 id="2-currently-implemented-system">2. Currently Implemented System</h2>
+<h3 id="21-core-components">2.1 Core Components</h3>
+<hr>
+<h4 id="%F0%9F%9B%A9%EF%B8%8F-aircraft--domain-model">🛩️ <code>Aircraft</code> — Domain Model</h4>
+<p>The central entity representing a single aircraft in the simulation.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>callsign</code></td>
+<td><code>String</code></td>
+<td>Unique identifier (e.g., <code>&quot;AA101&quot;</code>)</td>
+</tr>
+<tr>
+<td><code>lat</code></td>
+<td><code>double</code></td>
+<td>Current latitude (decimal degrees)</td>
+</tr>
+<tr>
+<td><code>lon</code></td>
+<td><code>double</code></td>
+<td>Current longitude (decimal degrees)</td>
+</tr>
+<tr>
+<td><code>altitude</code></td>
+<td><code>double</code></td>
+<td>Current altitude in feet</td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td><code>double</code></td>
+<td>Speed in knots</td>
+</tr>
+<tr>
+<td><code>heading</code></td>
+<td><code>double</code></td>
+<td>Direction of travel (0–360°)</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>AircraftType</code></td>
+<td>Performance envelope (max/min altitude)</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>AircraftCategory</code></td>
+<td>Priority classification</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>AircraftType</code></strong> — Defines performance boundaries per aircraft class:</p>
+<ul>
+<li>Maximum cruising altitude</li>
+<li>Minimum operating altitude</li>
+<li>Performance-based constraints used during resolution</li>
+</ul>
+<p><strong><code>AircraftCategory</code></strong> — Priority enumeration used to determine which aircraft yields in a conflict:</p>
+<pre class="hljs"><code><div>EMERGENCY  &gt;  MILITARY  &gt;  CIVILIAN
+</div></code></pre>
+<hr>
+<h4 id="%F0%9F%97%82%EF%B8%8F-aircraftmanager--state-container">🗂️ <code>AircraftManager</code> — State Container</h4>
+<p>Central registry that holds the live collection of all active <code>Aircraft</code> objects. Acts as the single source of truth for the simulation state. All engines read from and write to this manager.</p>
+<hr>
+<h4 id="%F0%9F%94%84-movementengine--position-propagator">🔄 <code>MovementEngine</code> — Position Propagator</h4>
+<p>Advances each aircraft's position forward in time by computing displacement from its current <code>heading</code> and <code>speed</code>.</p>
+<p><strong>Algorithm (per tick):</strong></p>
+<pre class="hljs"><code><div>Δlat = speed × cos(heading) × Δt
+Δlon = speed × sin(heading) × Δt
+aircraft.lat += Δlat
+aircraft.lon += Δlon
+</div></code></pre>
+<p>This is a simplified flat-earth approximation suitable for simulation-scale distances.</p>
+<hr>
+<h4 id="%E2%9A%A0%EF%B8%8F-conflictdetector--spatial-conflict-analyzer">⚠️ <code>ConflictDetector</code> — Spatial Conflict Analyzer</h4>
+<p>Performs <strong>pairwise comparison</strong> of all aircraft to identify conflicts. Returns a <code>List&lt;Conflict&gt;</code> representing all active violations.</p>
+<p><strong>Detection Criteria (current):</strong></p>
+<ul>
+<li>Two aircraft are in conflict when their <strong>3D proximity</strong> falls below the defined separation threshold.</li>
+<li>Comparisons are exhaustive: every aircraft pair <code>(i, j)</code> where <code>i &lt; j</code> is evaluated.</li>
+</ul>
+<hr>
+<h4 id="%F0%9F%93%8B-conflict--conflict-model">📋 <code>Conflict</code> — Conflict Model</h4>
+<p>Represents a detected conflict between exactly two aircraft.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aircraft1</code></td>
+<td><code>Aircraft</code></td>
+<td>First aircraft in the conflict pair</td>
+</tr>
+<tr>
+<td><code>aircraft2</code></td>
+<td><code>Aircraft</code></td>
+<td>Second aircraft in the conflict pair</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td><code>double</code></td>
+<td>Calculated proximity / urgency score</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="%E2%9A%99%EF%B8%8F-resolutionengine--rule-based-decision-maker">⚙️ <code>ResolutionEngine</code> — Rule-Based Decision Maker</h4>
+<p>The core decision logic unit. For each <code>Conflict</code>, it:</p>
+<ol>
+<li>
+<p><strong>Selects the target aircraft</strong> — the lower-priority aircraft yields:</p>
+<pre class="hljs"><code><div>EMERGENCY &gt; MILITARY &gt; CIVILIAN
+</div></code></pre>
+<p>In case of equal priority, the engine applies a deterministic tiebreaker.</p>
+</li>
+<li>
+<p><strong>Generates altitude options</strong> — four candidates evaluated in order:</p>
+<pre class="hljs"><code><div>+1000 ft  |  -1000 ft  |  +2000 ft  |  -2000 ft
+</div></code></pre>
+</li>
+<li>
+<p><strong>Validates each candidate</strong> against hard constraints:</p>
+<table>
+<thead>
+<tr>
+<th>Constraint</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maximum altitude</td>
+<td><code>newAlt ≤ aircraft.type.maxAltitude</code></td>
+</tr>
+<tr>
+<td>Non-negative altitude</td>
+<td><code>newAlt &gt; 0</code></td>
+</tr>
+<tr>
+<td>Vertical separation buffer</td>
+<td><code>|newAlt - otherAlt| ≥ SAFE_VERTICAL_SEPARATION</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p><strong>Applies the first valid resolution</strong> and outputs a <code>Resolution</code> object.</p>
+</li>
+</ol>
+<hr>
+<h4 id="%F0%9F%93%84-resolution--resolution-model">📄 <code>Resolution</code> — Resolution Model</h4>
+<p>Encapsulates a single resolution action taken by the engine.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aircraft</code></td>
+<td><code>Aircraft</code></td>
+<td>The aircraft receiving the instruction</td>
+</tr>
+<tr>
+<td><code>newAltitude</code></td>
+<td><code>double</code></td>
+<td>Assigned new altitude</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td><code>String</code></td>
+<td>Human-readable explanation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="%F0%9F%A7%A0-atcengine--decision-orchestrator">🧠 <code>ATCEngine</code> — Decision Orchestrator</h4>
+<p>The top-level coordinator that drives the full <strong>detect → resolve → update</strong> cycle each tick.</p>
+<pre class="hljs"><code><div>ATCEngine.tick()
+│
+├── ConflictDetector.detect()    → List&lt;Conflict&gt;
+│
+├── ResolutionEngine.resolve()   → List&lt;Resolution&gt;
+│
+└── AircraftManager.applyAll()   → Updated State
+</div></code></pre>
+<hr>
+<h2 id="3-recent-improvements">3. Recent Improvements</h2>
+<h3 id="31-vertical-separation-enforcement">3.1 Vertical Separation Enforcement</h3>
+<p><strong>Change:</strong> The <code>ResolutionEngine</code> now validates that the proposed new altitude achieves meaningful vertical separation before applying a resolution.</p>
+<pre class="hljs"><code><div>if |proposedAltitude - otherAircraftAltitude| &gt;= SAFE_VERTICAL_SEPARATION:
+    → apply resolution
+else:
+    → skip (already safe or insufficient separation)
+</div></code></pre>
+<p><strong>Why this matters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Problem (Before)</th>
+<th>Solution (After)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolutions applied redundantly</td>
+<td>Skip resolutions when separation is already met</td>
+</tr>
+<tr>
+<td>Aircraft climbed infinitely</td>
+<td>Hard ceiling via max altitude constraint</td>
+</tr>
+<tr>
+<td>Control loop never converged</td>
+<td>Termination condition guaranteed each cycle</td>
+</tr>
+<tr>
+<td>Unstable simulation behavior</td>
+<td>Predictable, stable state transitions</td>
+</tr>
+</tbody>
+</table>
+<p>This single change was foundational: it transformed the resolution loop from a potentially divergent system into a <strong>convergent control loop</strong>.</p>
+<hr>
+<h3 id="32-improved-test-coverage">3.2 Improved Test Coverage</h3>
+<p><strong><code>MovementEngine</code> Tests:</strong></p>
+<ul>
+<li>Replaced brittle exact-equality assertions with <strong>displacement-based validation</strong></li>
+<li>Tests now verify that aircraft moved in the correct direction by at least a minimum threshold distance</li>
+<li>Resilient to floating-point precision drift</li>
+</ul>
+<p><strong><code>ConflictDetector</code> Tests:</strong></p>
+<ul>
+<li>Added unit tests for aircraft pairs that:
+<ul>
+<li>Are clearly in conflict (within separation minimum)</li>
+<li>Are clearly safe (far apart)</li>
+<li>Are on the boundary of the separation threshold</li>
+</ul>
+</li>
+<li>Tests validate both the number and identity of detected conflicts</li>
+</ul>
+<hr>
+<h2 id="4-current-limitations">4. Current Limitations</h2>
+<p>WatchyoJet is a deliberate, iterative build. The following limitations reflect the current scope, not the target state:</p>
+<table>
+<thead>
+<tr>
+<th>Limitation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reactive, not predictive</strong></td>
+<td>Conflicts are resolved after they are detected, not before they occur</td>
+</tr>
+<tr>
+<td><strong>Vertical separation only</strong></td>
+<td>No horizontal separation rules are enforced (e.g., 5 nautical miles)</td>
+</tr>
+<tr>
+<td><strong>No trajectory prediction</strong></td>
+<td>The system cannot anticipate future positions or pre-emptively intervene</td>
+</tr>
+<tr>
+<td><strong>No real-time input</strong></td>
+<td>Aircraft state is internal-only; no live data feeds or external sources</td>
+</tr>
+<tr>
+<td><strong>No frontend</strong></td>
+<td>No map visualization or user interface exists yet</td>
+</tr>
+<tr>
+<td><strong>No persistence layer</strong></td>
+<td>No database; all state is in-memory and lost between runs</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-future-architecture">5. Future Architecture</h2>
+<p>The target architecture is a fully-integrated, real-time ATC platform:</p>
+<pre class="hljs"><code><div>╔══════════════════════════════════════════════════════════╗
+║              WATCHYOJET — TARGET ARCHITECTURE            ║
+╠══════════════════════════════════════════════════════════╣
+║                                                          ║
+║   ┌─────────────────────────────────────────────────┐   ║
+║   │         FRONTEND  (React + Map Library)          │   ║
+║   │   • Live aircraft map   • Real-time updates      │   ║
+║   │   • Control panel       • Flight path overlay    │   ║
+║   └──────────────────────┬──────────────────────────┘   ║
+║                          │  REST / WebSocket             ║
+║   ┌──────────────────────▼──────────────────────────┐   ║
+║   │        SPRING BOOT BACKEND  (API Layer)          │   ║
+║   │   • REST endpoints     • WebSocket server        │   ║
+║   │   • Auth / routing     • State broadcasting      │   ║
+║   └──────────────────────┬──────────────────────────┘   ║
+║                          │                               ║
+║   ┌──────────────────────▼──────────────────────────┐   ║
+║   │          ATC DECISION ENGINE  (Core)             │   ║
+║   │   • Conflict detection  • Resolution logic       │   ║
+║   │   • Priority rules      • Trajectory prediction  │   ║
+║   └──────────────────────┬──────────────────────────┘   ║
+║                          │                               ║
+║   ┌──────────────────────▼──────────────────────────┐   ║
+║   │          SIMULATION ENGINE  (Physics)            │   ║
+║   │   • MovementEngine      • AircraftManager        │   ║
+║   │   • Time step control   • Dynamic add/remove     │   ║
+║   └──────────────────────┬──────────────────────────┘   ║
+║                          │                               ║
+║   ┌──────────────────────▼──────────────────────────┐   ║
+║   │             DATA LAYER  (Persistence)            │   ║
+║   │   • Aircraft registry   • Conflict logs          │   ║
+║   │   • Simulation history  • Resolution audit trail │   ║
+║   └─────────────────────────────────────────────────┘   ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+</div></code></pre>
+<hr>
+<h2 id="6-future-features">6. Future Features</h2>
+<h3 id="61-trajectorypredictor">6.1 <code>TrajectoryPredictor</code></h3>
+<p>Transform the system from <strong>reactive</strong> to <strong>proactive</strong>.</p>
+<ul>
+<li>Compute predicted positions for each aircraft <code>N</code> seconds into the future</li>
+<li>Run conflict detection on the <strong>predicted trajectory</strong>, not current position</li>
+<li>Issue preemptive resolution instructions before aircraft enter conflict zones</li>
+<li>Enables smooth, anticipatory control rather than emergency corrections</li>
+</ul>
+<hr>
+<h3 id="62-horizontal-separation">6.2 Horizontal Separation</h3>
+<p>Implement the real-world ICAO standard of <strong>5 nautical miles</strong> lateral separation.</p>
+<ul>
+<li>Extend <code>ConflictDetector</code> to compute 2D horizontal distance using the Haversine formula</li>
+<li>A conflict is raised when: <code>horizontalDist &lt; 5nm AND verticalDist &lt; 1000ft</code></li>
+<li>Resolution engine generates heading-based and speed-based alternatives</li>
+<li>This closes the largest gap between simulation and real ATC practice</li>
+</ul>
+<hr>
+<h3 id="63-frontend--react--maps">6.3 Frontend — React + Maps</h3>
+<p>Live, interactive aircraft visualization:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Map canvas</td>
+<td>Leaflet or Mapbox</td>
+<td>Render aircraft positions in real time</td>
+</tr>
+<tr>
+<td>Aircraft icons</td>
+<td>SVG overlays</td>
+<td>Directional icons with callsign labels</td>
+</tr>
+<tr>
+<td>Flight paths</td>
+<td>Polylines</td>
+<td>Show predicted and historical paths</td>
+</tr>
+<tr>
+<td>Control panel</td>
+<td>React components</td>
+<td>Add/remove aircraft, adjust parameters</td>
+</tr>
+<tr>
+<td>Conflict alerts</td>
+<td>Toast/overlay</td>
+<td>Visual highlight of active conflicts</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="64-spring-boot-backend">6.4 Spring Boot Backend</h3>
+<p><strong>REST API Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/aircraft</code></td>
+<td>Add a new aircraft to simulation</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/aircraft/{id}</code></td>
+<td>Remove an aircraft</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/aircraft</code></td>
+<td>Fetch all current aircraft states</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/conflicts</code></td>
+<td>Fetch active conflict list</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/simulation/start</code></td>
+<td>Start the simulation loop</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/simulation/pause</code></td>
+<td>Pause the simulation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>WebSocket Channel:</strong></p>
+<ul>
+<li><code>/ws/simulation</code> — Broadcasts full simulation state every tick to all connected clients</li>
+<li>Enables the frontend map to update in real time without polling</li>
+</ul>
+<hr>
+<h3 id="65-real-time-simulation-control">6.5 Real-Time Simulation Control</h3>
+<ul>
+<li>Inject new aircraft mid-simulation via API or UI</li>
+<li>Remove aircraft (landed, diverted, etc.)</li>
+<li>Modify flight parameters (altitude, heading, speed) dynamically</li>
+<li>Pause / resume / reset the simulation clock</li>
+<li>Adjustable tick rate for fast-forward or real-time modes</li>
+</ul>
+<hr>
+<h3 id="66-airports--airspace-zones">6.6 Airports &amp; Airspace Zones</h3>
+<ul>
+<li>Define <code>Airport</code> entities with ICAO codes, runway layout, and approach corridors</li>
+<li>Create <strong>Areas of Responsibility (AoR)</strong> — bounded airspace sectors</li>
+<li>Assign aircraft to sectors; handoff logic between sectors</li>
+<li>Define approach and departure sequencing per airport</li>
+<li>Model restricted zones (military, no-fly) as exclusion polygons</li>
+</ul>
+<hr>
+<h3 id="67-persistence-layer">6.7 Persistence Layer</h3>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Storage Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Aircraft</code></td>
+<td>Persistent flight registry and metadata</td>
+</tr>
+<tr>
+<td><code>Conflict</code></td>
+<td>Audit log of all detected conflicts</td>
+</tr>
+<tr>
+<td><code>Resolution</code></td>
+<td>Full decision audit trail with timestamps</td>
+</tr>
+<tr>
+<td><code>SimulationRun</code></td>
+<td>Snapshots of simulation sessions</td>
+</tr>
+<tr>
+<td><code>AircraftPosition</code></td>
+<td>Time-series position history for replay</td>
+</tr>
+</tbody>
+</table>
+<p>Planned stack: <strong>PostgreSQL</strong> (relational data) + <strong>InfluxDB</strong> (time-series positions)</p>
+<hr>
+<h3 id="68-advanced-resolution-strategies">6.8 Advanced Resolution Strategies</h3>
+<p>Move beyond altitude-only resolution:</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Heading adjustments</strong></td>
+<td>Turn aircraft left or right by defined degrees</td>
+</tr>
+<tr>
+<td><strong>Speed control</strong></td>
+<td>Accelerate or decelerate to create time-based separation</td>
+</tr>
+<tr>
+<td><strong>Combined maneuvers</strong></td>
+<td>Altitude + heading changes for complex conflict scenarios</td>
+</tr>
+<tr>
+<td><strong>Multi-step planning</strong></td>
+<td>Plan a sequence of maneuvers over multiple ticks</td>
+</tr>
+<tr>
+<td><strong>Negotiated resolution</strong></td>
+<td>Coordinate instructions for both aircraft simultaneously</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="7-diagrams">7. Diagrams</h2>
+<h3 id="71-system-architecture-diagram">7.1 System Architecture Diagram</h3>
+<pre class="hljs"><code><div>                        ╔═══════════════════════════╗
+                        ║       ATCEngine            ║
+                        ║   (Orchestration Layer)    ║
+                        ╚═══════════╤═══════════════╝
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+    ╔═════════▼═════════╗ ╔════════▼════════╗ ╔══════════▼══════════╗
+    ║  ConflictDetector  ║ ║ ResolutionEngine║ ║   MovementEngine    ║
+    ║  ─────────────────║ ║ ────────────────║ ║  ──────────────────  ║
+    ║  Pairwise scan     ║ ║ Priority rules  ║ ║  heading + speed    ║
+    ║  → List&lt;Conflict&gt;  ║ ║ Altitude opts   ║ ║  → Δlat, Δlon      ║
+    ╚═════════╤═════════╝ ║ Constraints     ║ ╚══════════╤══════════╝
+              │           ║ → List&lt;Resolut.&gt;║             │
+              │           ╚════════╤════════╝             │
+              │                    │                      │
+              └─────────────────►  │  ◄────────────────────┘
+                                   │
+                        ╔══════════▼══════════╗
+                        ║   AircraftManager   ║
+                        ║  ──────────────────  ║
+                        ║  List&lt;Aircraft&gt;     ║
+                        ║  (Shared State)     ║
+                        ╚═════════════════════╝
+</div></code></pre>
+<hr>
+<h3 id="72-class-diagram">7.2 Class Diagram</h3>
+<pre class="hljs"><code><div>┌────────────────────────────┐         ┌──────────────────────────┐
+│         Aircraft           │         │       AircraftType        │
+│ ─────────────────────────  │    ┌───▶│ ───────────────────────  │
+│ + callsign: String         │    │    │ + maxAltitude: double    │
+│ + lat: double              │    │    │ + minAltitude: double    │
+│ + lon: double              │    │    └──────────────────────────┘
+│ + altitude: double         │    │
+│ + speed: double            │    │    ┌──────────────────────────┐
+│ + heading: double          │────┘    │    AircraftCategory       │
+│ + type: AircraftType       │    ┌───▶│ ───────────────────────  │
+│ + category: AircraftCategory│───┘    │  EMERGENCY               │
+└────────────┬───────────────┘         │  MILITARY                │
+             │                         │  CIVILIAN                │
+             │ managed by              └──────────────────────────┘
+             ▼
+┌────────────────────────────┐         ┌──────────────────────────┐
+│      AircraftManager       │         │         Conflict          │
+│ ─────────────────────────  │         │ ───────────────────────  │
+│ + aircraft: List&lt;Aircraft&gt; │         │ + aircraft1: Aircraft    │
+│ + add(Aircraft)            │         │ + aircraft2: Aircraft    │
+│ + remove(String)           │         │ + severity: double       │
+│ + getAll(): List&lt;Aircraft&gt; │         └──────────────────────────┘
+└────────────┬───────────────┘                      ▲
+             │                                      │ produces
+             │ used by                              │
+    ┌────────┴─────────────────────────────────────┐│
+    │                   ATCEngine                   ││
+    │ ──────────────────────────────────────────── ││
+    │ + conflictDetector: ConflictDetector          ││
+    │ + resolutionEngine: ResolutionEngine          ││
+    │ + movementEngine: MovementEngine              ││
+    │ + tick(): void                                ││
+    └────────┬──────────────┬────────────────┬─────┘│
+             │              │                │      │
+    ┌────────▼──────┐ ┌─────▼──────┐ ┌──────▼────┐ │
+    │ConflictDetector│ │Resolution  │ │Movement   │ │
+    │───────────────│ │Engine      │ │Engine     │ │
+    │+ detect(      │─┤────────────│ │───────────│ │
+    │  List&lt;Aircraf&gt;│ │+ resolve(  │ │+ update(  │ │
+    │): List&lt;       │►│  List&lt;     │ │  List&lt;    │ │
+    │  Conflict&gt;    │ │  Conflict&gt; │ │  Aircraf&gt; │ │
+    └───────────────┘ │): List&lt;   │ │): void    │ │
+                      │  Resolut.&gt;│ └───────────┘ │
+                      └───────────┘               │
+                            │                     │
+                            ▼                     │
+              ┌─────────────────────────┐         │
+              │        Resolution        │◀────────┘
+              │ ─────────────────────── │
+              │ + aircraft: Aircraft    │
+              │ + newAltitude: double   │
+              │ + reason: String        │
+              └─────────────────────────┘
+</div></code></pre>
+<hr>
+<h3 id="73-sequence-diagram--atc-decision-cycle">7.3 Sequence Diagram — ATC Decision Cycle</h3>
+<pre class="hljs"><code><div>   Client          ATCEngine      ConflictDetector  ResolutionEngine  AircraftManager
+     │                 │                 │                  │                │
+     │──── tick() ────▶│                 │                  │                │
+     │                 │                 │                  │                │
+     │                 │── getAll() ────────────────────────────────────────▶│
+     │                 │◀─ List&lt;Aircraft&gt; ──────────────────────────────────-│
+     │                 │                 │                  │                │
+     │                 │── detect(List) ▶│                  │                │
+     │                 │    (pairwise    │                  │                │
+     │                 │     scan)       │                  │                │
+     │                 │◀─ List&lt;Conflict&gt;│                  │                │
+     │                 │                 │                  │                │
+     │                 │─────────────────────── resolve(    │                │
+     │                 │                         List&lt;      │                │
+     │                 │                         Conflict&gt;) ▶                │
+     │                 │                 │       │           │                │
+     │                 │                 │  [for each conflict]               │
+     │                 │                 │       │ selectTarget()             │
+     │                 │                 │       │ generateOptions()          │
+     │                 │                 │       │ validateConstraints()      │
+     │                 │                 │       │ applyFirst Valid()         │
+     │                 │                 │       │                            │
+     │                 │◀─────────────────────── List&lt;Resolution&gt;            │
+     │                 │                 │                  │                │
+     │                 │── applyAll(List&lt;Resolution&gt;) ──────────────────────▶│
+     │                 │── advance(List&lt;Aircraft&gt;) ─────────────────────────▶│
+     │                 │◀─ Updated State ────────────────────────────────────│
+     │                 │                 │                  │                │
+     │◀── tick done ───│                 │                  │                │
+     │                 │                 │                  │                │
+</div></code></pre>
+<hr>
+<h3 id="74-state-diagram--aircraft-lifecycle">7.4 State Diagram — Aircraft Lifecycle</h3>
+<pre class="hljs"><code><div>                           ┌─────────────────────┐
+                           │                     │
+                           │      INACTIVE        │
+                           │   (not yet added)    │
+                           │                     │
+                           └──────────┬──────────┘
+                                      │
+                                  add(aircraft)
+                                      │
+                           ┌──────────▼──────────┐
+                           │                     │
+                    ┌──────│      CRUISING        │◀─────────────┐
+                    │      │  (nominal flight)    │              │
+                    │      │                     │              │
+                    │      └──────────┬──────────┘              │
+                    │                 │                         │
+                    │        conflict detected                  │
+                    │                 │                         │
+                    │      ┌──────────▼──────────┐             │
+                    │      │                     │             │
+                    │      │  IN CONFLICT         │             │
+                    │      │  (violation active)  │             │
+                    │      │                     │             │
+                    │      └──────────┬──────────┘             │
+                    │                 │                         │
+                    │        resolution assigned                │
+                    │                 │                         │
+                    │      ┌──────────▼──────────┐             │
+                    │      │                     │             │
+                    │      │   RESOLVING          │             │
+                    │      │  (maneuver applied)  │             │
+                    │      │                     │             │
+                    │      └──────────┬──────────┘             │
+                    │                 │                         │
+                    │         separation achieved ──────────────┘
+                    │
+                    │  remove(aircraft)
+                    │
+          ┌─────────▼───────────┐
+          │                     │
+          │      REMOVED         │
+          │  (landed / diverted) │
+          │                     │
+          └─────────────────────┘
+</div></code></pre>
+<hr>
+<h2 id="8-engineering-quality--standards">8. Engineering Quality &amp; Standards</h2>
+<h3 id="design-principles">Design Principles</h3>
+<table>
+<thead>
+<tr>
+<th>Principle</th>
+<th>Application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Single Responsibility</strong></td>
+<td>Each engine owns exactly one concern (detect / resolve / move)</td>
+</tr>
+<tr>
+<td><strong>Dependency Injection</strong></td>
+<td><code>ATCEngine</code> receives its collaborators; testable in isolation</td>
+</tr>
+<tr>
+<td><strong>Immutable Models</strong></td>
+<td><code>Conflict</code> and <code>Resolution</code> are value objects; no side effects</td>
+</tr>
+<tr>
+<td><strong>Fail-Safe Defaults</strong></td>
+<td>No resolution is applied if no valid option exists</td>
+</tr>
+<tr>
+<td><strong>Convergent Control Loop</strong></td>
+<td>Vertical separation check ensures the loop always terminates</td>
+</tr>
+</tbody>
+</table>
+<h3 id="test-strategy">Test Strategy</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Test Type</th>
+<th>Approach</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MovementEngine</code></td>
+<td>Unit</td>
+<td>Displacement-based assertions (float-safe)</td>
+</tr>
+<tr>
+<td><code>ConflictDetector</code></td>
+<td>Unit</td>
+<td>Boundary value testing (within / at / beyond sep)</td>
+</tr>
+<tr>
+<td><code>ResolutionEngine</code></td>
+<td>Unit</td>
+<td>Priority logic + constraint validation</td>
+</tr>
+<tr>
+<td><code>ATCEngine</code></td>
+<td>Integration</td>
+<td>Full cycle test with known initial state</td>
+</tr>
+</tbody>
+</table>
+<h3 id="code-quality-targets">Code Quality Targets</h3>
+<ul>
+<li>All public methods documented with Javadoc</li>
+<li>No magic numbers — all constants named and centralized (e.g., <code>SAFE_VERTICAL_SEPARATION</code>)</li>
+<li>Separation of concerns enforced at the package level</li>
+<li>All resolution decisions logged with structured reasoning strings</li>
+</ul>
+<hr>
+<h2 id="project-metadata">Project Metadata</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Project</strong></td>
+<td>WatchyoJet</td>
+</tr>
+<tr>
+<td><strong>Type</strong></td>
+<td>Autonomous ATC Decision System (Simulation)</td>
+</tr>
+<tr>
+<td><strong>Language</strong></td>
+<td>Java</td>
+</tr>
+<tr>
+<td><strong>Target</strong></td>
+<td>Full-stack ATC Platform (Spring Boot + React)</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Core engine implemented; UI/Backend pending</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>Documentation generated for WatchyoJet v1.0 — Core Engine Release.</em></p>
+
+</body>
+</html>
