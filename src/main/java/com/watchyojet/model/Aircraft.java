@@ -2,6 +2,7 @@ package com.watchyojet.model;
 
 public class Aircraft {
 
+    private AircraftType type;
     private String callsign;
     private double lat;
     private double lon;
@@ -10,13 +11,16 @@ public class Aircraft {
     private double heading;
 
     public Aircraft(String callsign, double lat, double lon,
-                    double altitude, double speed, double heading) {
-        this.callsign = callsign;
-        this.lat = lat;
-        this.lon = lon;
-        this.altitude = altitude;
-        this.speed = speed;
-        this.heading = heading;
+    double altitude, double speed, double heading,
+    AircraftType type) 
+    {
+    this.callsign = callsign;
+    this.lat = lat;
+    this.lon = lon;
+    this.altitude = altitude;
+    this.speed = speed;
+    this.heading = heading;
+    this.type = type;
     }
 
     public double getLat()
@@ -60,5 +64,14 @@ public class Aircraft {
     public void setAltitude(double altitude) 
     {
     this.altitude = altitude;
+    }
+    public AircraftType getType() 
+    {
+    return type;
+    }
+
+    public AircraftCategory getCategory()
+    {
+    return type.getCategory();
     }
 }
