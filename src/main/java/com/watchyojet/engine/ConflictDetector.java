@@ -22,11 +22,11 @@ public class ConflictDetector {
 
                 double dist = distance(a1, a2);
 
-                if (dist < MIN_DISTANCE) {
+                double altitudeDiff = Math.abs(a1.getAltitude() - a2.getAltitude());
+                if (dist < MIN_DISTANCE && altitudeDiff < 1000) 
+                    {
                     conflicts.add(new Conflict(a1, a2));
-
-                    System.out.println("⚠️ Conflict detected between "
-                            + a1.getCallsign() + " and " + a2.getCallsign());
+                     System.out.println("⚠️ Conflict detected between "+ a1.getCallsign() + " and " + a2.getCallsign());
                 }
             }
         }
