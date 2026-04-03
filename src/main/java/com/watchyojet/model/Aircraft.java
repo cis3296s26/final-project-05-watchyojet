@@ -21,7 +21,7 @@ public class Aircraft {
 
     public double getLat()
     {
-     return lat; 
+        return lat; 
     }
     public double getLon()
     { 
@@ -30,6 +30,10 @@ public class Aircraft {
     public double getHeading() 
     {
          return heading;
+    }
+    public void setHeading(double heading)
+    {
+        this.heading = heading;
     }
     public double getSpeed() 
     { 
@@ -48,5 +52,13 @@ public class Aircraft {
     public String getCallsign() 
     {
         return callsign;
+    }
+    public double getAltitude() 
+    {
+        return altitude;
+    }
+    public void setAltitude(double altitude) 
+    {
+    this.altitude = altitude;
     }
 }
