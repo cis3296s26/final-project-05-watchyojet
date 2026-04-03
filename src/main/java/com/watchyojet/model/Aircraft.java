@@ -18,7 +18,7 @@ public class Aircraft {
     this.lat = lat;
     this.lon = lon;
     this.altitude = altitude;
-    this.speed = speed;
+    this.speed = speed;//nau mi/hr
     this.heading = heading;
     this.type = type;
     }
