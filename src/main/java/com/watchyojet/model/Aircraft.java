@@ -44,4 +44,9 @@ public class Aircraft {
     {
          this.lon = lon; 
     }
+
+    public String getCallsign() 
+    {
+        return callsign;
+    }
 }

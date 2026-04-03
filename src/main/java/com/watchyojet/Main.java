@@ -1,16 +1,24 @@
 package com.watchyojet;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.watchyojet.engine.ConflictDetector;
 import com.watchyojet.model.Aircraft;
-import com.watchyojet.simulation.MovementEngine;
 
 public class Main {
     public static void main(String[] args) {
 
-        Aircraft a = new Aircraft("A1", 0, 0, 30000, 800, 45);
+        List<Aircraft> aircrafts = new ArrayList<>();
 
-        MovementEngine engine = new MovementEngine();
-        engine.update(a);
+        // CLOSE aircraft → should trigger conflict
+        aircrafts.add(new Aircraft("A1", 0, 0, 30000, 800, 45));
+        aircrafts.add(new Aircraft("A2", 1, 1, 30000, 800, 225));
 
-        System.out.println("New position: " + a.getLat() + ", " + a.getLon());
+        // FAR aircraft → no conflict
+        aircrafts.add(new Aircraft("A3", 100, 100, 30000, 800, 90));
+
+        ConflictDetector detector = new ConflictDetector();
+        detector.detectConflicts(aircrafts);
     }
 }
