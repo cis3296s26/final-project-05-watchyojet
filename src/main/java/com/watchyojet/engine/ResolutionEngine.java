@@ -11,6 +11,7 @@ public class ResolutionEngine {
 
     private static final double ALTITUDE_STEP = 1000;
     private static final double ALTITUDE_BUFFER = 500;
+    private static final double SAFE_VERTICAL_SEPARATION = 1000;
     private double snapToFlightLevel(double altitude)
     {
     return Math.round(altitude / 1000) * 1000;
@@ -20,6 +21,12 @@ public class ResolutionEngine {
 
         Aircraft a1 = c.getA1();
         Aircraft a2 = c.getA2();
+        double separation = Math.abs(a1.getAltitude() - a2.getAltitude());
+        if (separation >= SAFE_VERTICAL_SEPARATION) {
+            System.out.println("Conflict already resolved between " + a1.getCallsign() + " and " + a2.getCallsign());
+            return null; // no resolution needed
+        }
+
 
         Aircraft a;
 
@@ -65,9 +72,7 @@ public class ResolutionEngine {
         return new Resolution(a, Math.min(currentAlt + ALTITUDE_STEP, maxAlt));   
      }
 
-    private boolean isAltitudeFree(double targetAlt,
-                                   List<Aircraft> aircrafts,
-                                   Aircraft self) {
+    private boolean isAltitudeFree(double targetAlt, List<Aircraft> aircrafts, Aircraft self) {
 
         for (Aircraft other : aircrafts) {
 
