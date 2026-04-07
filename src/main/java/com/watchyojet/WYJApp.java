@@ -13,7 +13,7 @@ public class WYJApp extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(WYJApp.class.getResource("/test-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 600);
-        stage.setTitle("Leaflet WebView Example");
+        stage.setTitle("WatchYoJet");
         stage.setScene(scene);
         stage.show();
         System.out.println("Creating Window");
