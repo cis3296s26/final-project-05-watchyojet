@@ -2,6 +2,7 @@ package com.watchyojet.engine;
 
 import java.util.List;
 
+import com.watchyojet.WYJAppController;
 import com.watchyojet.model.Aircraft;
 import com.watchyojet.model.Conflict;
 import com.watchyojet.model.Resolution;
@@ -27,7 +28,7 @@ public class ATCEngine {
 
         // MOVE aircraft FIRST
         movement.updatePositions(aircrafts);
-/*
+
         //  Detect conflicts
         List<Conflict> conflicts = detector.detectConflicts(aircrafts);
 
@@ -46,9 +47,14 @@ public class ATCEngine {
             Aircraft a = r.getAircraft();
             a.setAltitude(r.getNewAltitude());
         }
-*/
+
+        //UPDATE AIRCRAFT POSITIONS ON MAP
+        for(Aircraft aircraft : aircrafts){
+            WYJAppController.getInstance().updateMapPoint(aircraft.getCallsign(),aircraft.getLat(),aircraft.getLon());
+        }
 
 
+/*
         //FUTURE TESTING
         double futureSeconds = 0.0003;
         System.out.println("\n--------------\nSearching for conflict "+futureSeconds+" seconds into the future.");
@@ -70,7 +76,7 @@ public class ATCEngine {
 
             Aircraft a = r.getAircraft();
             a.setAltitude(r.getNewAltitude());
-        }
+        }*/
         System.out.println("\n ---------------\n ");
     }
 }
