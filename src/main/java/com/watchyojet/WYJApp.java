@@ -1,14 +1,19 @@
 package com.watchyojet;
 
 import javafx.application.Application;
+import javafx.concurrent.Worker;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class WYJApp extends Application {
+
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(WYJApp.class.getResource("/test-view.fxml"));
@@ -17,8 +22,23 @@ public class WYJApp extends Application {
         stage.setScene(scene);
         stage.show();
         System.out.println("Creating Window");
-    }
 
+        WYJAppController controller = fxmlLoader.getController();
+        controller.handleThemeChange();
+        controller.webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                // Start your Main.main thread ONLY now
+                new Thread(controller.spawnMainThread).start();
+            }
+        });
+
+    }
+    @Override
+    public void stop() {
+        System.out.println("Killing Process...");
+
+        System.exit(0);
+    }
     public static void main(String[] args) {
         launch();
     }

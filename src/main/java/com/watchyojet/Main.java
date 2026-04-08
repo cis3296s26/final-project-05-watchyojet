@@ -12,9 +12,10 @@ public class Main {
 
         List<Aircraft> aircrafts = new ArrayList<>();
 
-        aircrafts.add(new Aircraft("A1", 0, 0, 30000, 800, 45, AircraftType.A320));
-        aircrafts.add(new Aircraft("A2", 1, 1, 30000, 800, 225, AircraftType.F16));
-        aircrafts.add(new Aircraft("A3", 100, 100, 30000, 800, 90, AircraftType.AIR_AMBULANCE));
+        aircrafts.add(new Aircraft("A1", 39.8730, -75.2437, 30000, 800, 45, AircraftType.A320));
+        aircrafts.add(new Aircraft("A2", 39.9730, -75.2437, 30000, 800, 225, AircraftType.F16));
+        aircrafts.add(new Aircraft("A3", 40.9730, -75.2437, 30000, 800, 90, AircraftType.AIR_AMBULANCE));
+        //
 
         ATCEngine engine = new ATCEngine();
 

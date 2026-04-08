@@ -2,15 +2,19 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.watchyojet.WYJAppController">
+<VBox fx:id="topContainer" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.watchyojet.WYJAppController">
    <MenuBar>
      <menus>
        <Menu mnemonicParsing="false" text="File">
@@ -23,16 +27,37 @@
            <MenuItem mnemonicParsing="false" text="Delete" />
          </items>
        </Menu>
-       <Menu mnemonicParsing="false" text="Help">
+       <Menu mnemonicParsing="false" text="Windows">
          <items>
-           <MenuItem mnemonicParsing="false" text="About" />
+               <CheckMenuItem fx:id="showLogs" mnemonicParsing="false" onAction="#toggleLogs" selected="true" text="Log" />
+               <CheckMenuItem mnemonicParsing="false" text="Simulation" />
          </items>
        </Menu>
+         <Menu mnemonicParsing="false" text="Settings">
+            <items>
+               <Menu mnemonicParsing="false" text="Theme">
+                 <items>
+                     <RadioMenuItem fx:id="light" mnemonicParsing="false" onAction="#handleThemeChange" text="Light">
+                        <toggleGroup>
+                           <ToggleGroup fx:id="Theme" />
+                        </toggleGroup>
+                     </RadioMenuItem>
+                     <RadioMenuItem mnemonicParsing="false" onAction="#handleThemeChange" selected="true" text="Dark" toggleGroup="$Theme" />
+                 </items>
+               </Menu>
+               <MenuItem mnemonicParsing="false" text="Save Configuration" />
+            </items>
+         </Menu>
+         <Menu mnemonicParsing="false" text="Help">
+            <items>
+               <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+         </Menu>
      </menus>
    </MenuBar>
-   <HBox>
+   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
       <children>
-         <VBox prefWidth="300.0">
+         <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
             <children>
              <Button mnemonicParsing="false" text="Test Button 1">
                   <VBox.margin>
@@ -54,11 +79,12 @@
                <Insets top="10.0" />
             </padding>
          </VBox>
-         <Pane maxWidth="10.0" minWidth="10.0" prefWidth="10.0" style="-fx-background-color: #3498db; -fx-border-color: #3498db;" />
+         <Pane maxHeight="1.7976931348623157E308" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" style="-fx-background-color: #3498db; -fx-border-color: #3498db;" />
       
           <!-- Add this line below -->
           <WebView fx:id="webView" />
       </children>
    </HBox>
+   <ListView fx:id="logList" prefHeight="200.0" prefWidth="200.0" stylesheets="@log-style.css" />
 
 </VBox>
