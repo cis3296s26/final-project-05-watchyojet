@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.watchyojet.model.Aircraft;
 
+// Springboot REST endpoints
+import org.springframework.stereotype.Component;
+
+@Component
 public class AircraftManager {
     private List<Aircraft> aircrafts = new ArrayList<>();
 
