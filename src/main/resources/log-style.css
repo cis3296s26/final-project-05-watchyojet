@@ -1,0 +1,16 @@
+.list-cell {
+    -fx-text-fill: white;
+    -fx-font-family: "Consolas"
+}
+
+.list-cell:odd {
+    -fx-background-color: black;
+}
+
+.list-cell:even {
+    -fx-background-color: #333333;
+}
+
+.list-cell:empty {
+    -fx-background-color: black;
+}

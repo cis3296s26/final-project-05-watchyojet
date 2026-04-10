@@ -14,8 +14,12 @@ public class Main {
         OpenSkyFetcher fetcher = new OpenSkyFetcher();
         ATCEngine engine = new ATCEngine();
 
-        long lastApiFetchTime = 0;
-        long API_COOLDOWN_MS = 12000; // 12 second cooldown to prevent OpenSky IP Ban
+        List<Aircraft> aircrafts = new ArrayList<>();
+
+        aircrafts.add(new Aircraft("A1", 39.8730, -75.2437, 30000, 800, 45, AircraftType.A320));
+        aircrafts.add(new Aircraft("A2", 39.9730, -75.2437, 30000, 800, 225, AircraftType.F16));
+        aircrafts.add(new Aircraft("A3", 40.9730, -75.2437, 30000, 800, 90, AircraftType.AIR_AMBULANCE));
+        //
 
         System.out.println("Initializing WatchyoJet Autonomous ATC Shadow Mode...");
 
