@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leaflet Map</title>
+
+    <!-- FIXED Leaflet CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <style>
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+<!--p>
+    WELCOME TO THE MAP
+</p-->
+<div id="map"></div>
+
+<script>
+    var map = L.map('map').setView([39.8730, -75.2437], 12);
+    var marker = L.marker([39.8730, -75.2437]).addTo(map);
+
+    var aircraftMarkers = {};
+
+
+
+function updateAircraft(id, lat, lng) {
+    if (aircraftMarkers[id]) {
+        aircraftMarkers[id].setLatLng([lat, lng]);
+    } else {
+        aircraftMarkers[id] = L.marker([lat, lng]).addTo(map);
+    }
+}
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+}).addTo(map);
+
+    const resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+    });
+    resizeObserver.observe(document.getElementById('map'));
+
+    window.onload = () => {
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+            map.invalidateSize();
+        }, 500);
+    };
+</script>
+</body>
+</html>

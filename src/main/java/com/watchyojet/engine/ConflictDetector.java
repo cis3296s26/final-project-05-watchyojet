@@ -3,10 +3,14 @@ package com.watchyojet.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.watchyojet.WYJAppController;
 import com.watchyojet.model.Aircraft;
 import com.watchyojet.model.Conflict;
+import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 
 public class ConflictDetector {
+
 
     private static final double MIN_DISTANCE = 5.0;
 
@@ -27,6 +31,7 @@ public class ConflictDetector {
                     {
                     conflicts.add(new Conflict(a1, a2));
                      System.out.println("⚠️ Conflict detected between "+ a1.getCallsign() + " and " + a2.getCallsign());
+                     WYJAppController.getInstance().log("⚠ Conflict detected between "+ a1.getCallsign() + " and " + a2.getCallsign());
                 }
             }
         }
