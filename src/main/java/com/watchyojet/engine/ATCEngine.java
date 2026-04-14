@@ -27,7 +27,7 @@ public class ATCEngine {
         System.out.println("\n--- ATC Cycle ---");
 
         // MOVE aircraft FIRST
-        movement.updatePositions(aircrafts);
+        //movement.updatePositions(aircrafts);
 
         //  Detect conflicts
         List<Conflict> conflicts = detector.detectConflicts(aircrafts);

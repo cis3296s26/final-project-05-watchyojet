@@ -36,8 +36,14 @@
 function updateAircraft(id, lat, lng) {
     if (aircraftMarkers[id]) {
         aircraftMarkers[id].setLatLng([lat, lng]);
+        aircraftMarkers[id].setTooltipContent(id);
     } else {
-        aircraftMarkers[id] = L.marker([lat, lng]).addTo(map);
+        aircraftMarkers[id] = L.marker([lat, lng])
+            .addTo(map)
+            .bindTooltip(id, {
+                permanent: false, // Only shows on hover
+                direction: 'right'
+            });
     }
 }
 
