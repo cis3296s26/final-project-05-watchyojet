@@ -7,6 +7,7 @@
     <!-- FIXED Leaflet CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.marker.slideto@0.2.0/Leaflet.Marker.SlideTo.js"></script>
 
     <meta name="referrer" content="no-referrer-when-downgrade">
     <style>
@@ -35,13 +36,17 @@
 
 function updateAircraft(id, lat, lng) {
     if (aircraftMarkers[id]) {
-        aircraftMarkers[id].setLatLng([lat, lng]);
+        aircraftMarkers[id].slideTo([lat, lng], {
+            duration: 12000,
+            keepAtCenter: false // Set to true if you want the map to follow one specific aircraft
+        });
         aircraftMarkers[id].setTooltipContent(id);
     } else {
+        // Initial creation of the marker
         aircraftMarkers[id] = L.marker([lat, lng])
             .addTo(map)
             .bindTooltip(id, {
-                permanent: false, // Only shows on hover
+                permanent: false,
                 direction: 'right'
             });
     }
