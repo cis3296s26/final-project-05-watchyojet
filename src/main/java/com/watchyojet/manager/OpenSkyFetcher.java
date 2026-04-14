@@ -1,10 +1,5 @@
 package com.watchyojet.manager;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.watchyojet.model.Aircraft;
-import com.watchyojet.model.AircraftType;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -12,6 +7,11 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.watchyojet.model.Aircraft;
+import com.watchyojet.model.AircraftType;
 
 public class OpenSkyFetcher {
     // We set a bounding box around Philadelphia International Airport (PHL)
@@ -48,9 +48,16 @@ public class OpenSkyFetcher {
             if (statesNode != null && statesNode.isArray()) {
                 for (JsonNode state : statesNode) {
                     // Skip data missing crucial positioning stats to avoid null errors
-                    if (state.get(1).isNull() || state.get(5).isNull() || state.get(6).isNull() || state.get(7).isNull() || state.get(9).isNull() || state.get(10).isNull()) {
-                        continue;
-                    }
+                    if (state.size() < 11 ||
+                            state.get(1).isNull() ||
+                            state.get(5).isNull() ||
+                            state.get(6).isNull() ||
+                            state.get(7).isNull() ||
+                            state.get(9).isNull() ||
+                            state.get(10).isNull()) 
+                            {
+                             continue;
+                          }
 
                     String callsign = state.get(1).asText().trim();
                     if (callsign.isEmpty()) callsign = state.get(0).asText(); // fallback to ICAO 24-bit address
