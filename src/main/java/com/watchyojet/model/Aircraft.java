@@ -74,4 +74,15 @@ public class Aircraft {
     {
     return type.getCategory();
     }
+
+   public String getFlightPhase()
+    {
+            double alt = this.getAltitude();
+            double speed = this.getSpeed();
+
+      if (alt < 1000 && speed < 150) return "TAKEOFF_LANDING";
+     if (alt < 3000) return "FINAL_APPROACH";
+     if (alt < 10000) return "CLIMB_DESCENT";
+     return "CRUISE";
+}
 }

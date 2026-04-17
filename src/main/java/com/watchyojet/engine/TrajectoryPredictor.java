@@ -2,26 +2,27 @@ package com.watchyojet.engine;
 
 import com.watchyojet.model.Aircraft;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TrajectoryPredictor {
 
+    // Predicts the future position of an aircraft after a given time in seconds
+    public static double[] predictPosition(Aircraft a, double timeSeconds) {
 
-    public List<Aircraft> predict(List<Aircraft> aircrafts, double seconds){
-        List<Aircraft> futureAircrafts = new ArrayList<>(aircrafts);
-        for (Aircraft a : futureAircrafts) {
+        double lat = a.getLat();
+        double lon = a.getLon();
 
-            double speed = a.getSpeed();      // units per cycle
-            double heading = Math.toRadians(a.getHeading());
+        double speed = a.getSpeed(); // knots
+        double heading = Math.toRadians(a.getHeading());
 
-            double dx = speed * Math.cos(heading) * seconds;
-            double dy = speed * Math.sin(heading) * seconds;
+        // Distance traveled in nautical miles
+        double distanceNm = speed * (timeSeconds / 3600.0);
 
-            a.setLat(a.getLat() + dx);
-            a.setLon(a.getLon() + dy);
-        }
+        // Convert to lat/lon movement
+        double dLat = distanceNm * Math.cos(heading) / 60.0;
+        double dLon = distanceNm * Math.sin(heading) / (60.0 * Math.cos(Math.toRadians(lat)));
 
-        return futureAircrafts;
+        double newLat = lat + dLat;
+        double newLon = lon + dLon;
+
+        return new double[]{newLat, newLon};
     }
 }

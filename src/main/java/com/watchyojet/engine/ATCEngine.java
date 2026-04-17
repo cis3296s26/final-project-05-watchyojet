@@ -25,15 +25,18 @@ public class ATCEngine {
     public void runCycle(List<Aircraft> aircrafts) {
 
         System.out.println("\n--- ATC Cycle ---");
-
-        // MOVE aircraft FIRST
-        movement.updatePositions(aircrafts);
+        System.out.println("ATC Engine processing aircraft:");
+for (Aircraft a : aircrafts) {
+    System.out.println(a.getCallsign());
+}
+    
 
         //  Detect conflicts
         List<Conflict> conflicts = detector.detectConflicts(aircrafts);
+        movement.updatePositions(aircrafts);
 
         if (conflicts.isEmpty()) {
-            System.out.println("No conflicts");
+            System.out.println("[STATUS] Airspace clear");
             return;
         }
 
@@ -49,9 +52,17 @@ public class ATCEngine {
         }
 
         //UPDATE AIRCRAFT POSITIONS ON MAP
-        for(Aircraft aircraft : aircrafts){
-            WYJAppController.getInstance().updateMapPoint(aircraft.getCallsign(),aircraft.getLat(),aircraft.getLon());
-        }
+       for (Aircraft aircraft : aircrafts) {
+    if (WYJAppController.getInstance() != null) {
+        WYJAppController.getInstance().updateMapPoint(
+                aircraft.getCallsign(),
+                aircraft.getLat(),
+                aircraft.getLon()
+        );
+    }
+}
+    }
+}
 
 
 /*
@@ -77,6 +88,4 @@ public class ATCEngine {
             Aircraft a = r.getAircraft();
             a.setAltitude(r.getNewAltitude());
         }*/
-        System.out.println("\n ---------------\n ");
-    }
-}
+ 

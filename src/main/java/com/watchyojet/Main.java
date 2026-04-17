@@ -1,4 +1,5 @@
 package com.watchyojet;
+
 import java.util.List;
 
 import com.watchyojet.engine.ATCEngine;
@@ -12,7 +13,7 @@ public class Main {
     private static final long API_COOLDOWN_MS = 12000;
 
     public static void main(String[] args) {
-        
+
         AircraftManager manager = new AircraftManager();
         OpenSkyFetcher fetcher = new OpenSkyFetcher();
         ATCEngine engine = new ATCEngine();
@@ -22,10 +23,13 @@ public class Main {
         while (true) {
             long currentTime = System.currentTimeMillis();
 
+            // Fetch LIVE aircraft from OpenSky
             if (currentTime - lastApiFetchTime > API_COOLDOWN_MS) {
-                System.out.println("\n[SYSTEM] Pinging OpenSky Network for live traffic (PHL Airspace)...");
+
+                System.out.println("\n[SYSTEM] Fetching LIVE traffic (PHL Airspace)...");
 
                 List<Aircraft> livePlanes = fetcher.fetchLiveTraffic();
+
                 manager.syncWithLiveData(livePlanes);
 
                 System.out.println("[SYSTEM] Airspace refreshed. Tracking "

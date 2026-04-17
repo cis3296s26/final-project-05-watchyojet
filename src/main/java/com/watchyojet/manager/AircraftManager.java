@@ -8,21 +8,39 @@ import java.util.Map;
 import com.watchyojet.model.Aircraft;
 
 public class AircraftManager {
-    // Using a map prevents duplicates
+
     private Map<String, Aircraft> aircraftMap = new HashMap<>();
 
     public void syncWithLiveData(List<Aircraft> liveData) {
-        List<String> activeCallsigns = new ArrayList<>();
+
+        Map<String, Aircraft> updatedMap = new HashMap<>();
 
         for (Aircraft livePlane : liveData) {
-            activeCallsigns.add(livePlane.getCallsign());
-            
-            // We just replace the object in the map so we always have the freshest coordinates/speed
-            aircraftMap.put(livePlane.getCallsign(), livePlane);
+
+            String callsign = livePlane.getCallsign();
+
+            if (aircraftMap.containsKey(callsign)) {
+
+                Aircraft existing = aircraftMap.get(callsign);
+
+                // Update dynamic properties from live data
+                existing.setLat(livePlane.getLat());
+                existing.setLon(livePlane.getLon());
+                existing.setHeading(livePlane.getHeading());
+
+                // Preserve simulated altitude (do not overwrite)
+
+                updatedMap.put(callsign, existing);
+
+            } else {
+
+                // New aircraft entering the airspace
+                updatedMap.put(callsign, livePlane);
+            }
         }
 
-        // Remove any planes from our system that werentt in the latest API ping (they landed or flew out of bounds)
-        aircraftMap.keySet().retainAll(activeCallsigns);
+        // Replace old map with updated one
+        aircraftMap = updatedMap;
     }
 
     public List<Aircraft> getAircrafts() {
