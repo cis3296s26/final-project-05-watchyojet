@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.marker.slideto@0.2.0/Leaflet.Marker.SlideTo.js"></script>
+    <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
 
     <meta name="referrer" content="no-referrer-when-downgrade">
     <style>
@@ -32,19 +33,26 @@
 
     var aircraftMarkers = {};
 
+const airplaneIcon = L.icon ({
 
+        iconUrl: 'WYJ_airplane_icon.png',
+        iconSize: [32,32],
+        iconAnchor: [16,16],
 
-function updateAircraft(id, lat, lng) {
+    });
+
+function updateAircraft(id, lat, lng, heading) {
     if (aircraftMarkers[id]) {
-        aircraftMarkers[id].slideTo([lat, lng], {
-            duration: 12000,
-            keepAtCenter: false // Set to true if you want the map to follow one specific aircraft
-        });
+        aircraftMarkers[id].setLatLng([lat , lng]);
         aircraftMarkers[id].setTooltipContent(id);
+        aircraftMarkers[id].setRotationAngle(heading);
     } else {
-        // Initial creation of the marker
-        aircraftMarkers[id] = L.marker([lat, lng])
-            .addTo(map)
+        aircraftMarkers[id] = L.marker([lat, lng], {
+            icon: airplaneIcon,
+            rotationAngle: 45,        // degrees
+            rotationOrigin: 'center center'
+        })
+        .addTo(map)
             .bindTooltip(id, {
                 permanent: false,
                 direction: 'right'
