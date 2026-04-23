@@ -44,12 +44,12 @@ public class ResolutionEngine {
         double currentAlt = a.getAltitude();
         double maxAlt = a.getType().getMaxAltitude();
 
-        double[] options = {
-                currentAlt + ALTITUDE_STEP,
-                currentAlt - ALTITUDE_STEP,
-                currentAlt + 2 * ALTITUDE_STEP,
-                currentAlt - 2 * ALTITUDE_STEP
-        };
+        // Search ±1000 through ±8000 ft in 1000-ft steps, closest first
+        double[] options = new double[16];
+        for (int k = 0; k < 8; k++) {
+            options[k * 2]     = currentAlt + (k + 1) * ALTITUDE_STEP;
+            options[k * 2 + 1] = currentAlt - (k + 1) * ALTITUDE_STEP;
+        }
 
         for (double alt : options) {
 
@@ -83,19 +83,29 @@ public class ResolutionEngine {
         return null;
     }
 
+    private static final double PROXIMITY_NM = 60.0;
+
     private boolean isAltitudeFree(double targetAlt, List<Aircraft> aircrafts, Aircraft self) {
 
         for (Aircraft other : aircrafts) {
 
             if (other == self) continue;
 
-            double diff = Math.abs(other.getAltitude() - targetAlt);
+            // Only check aircraft that are geographically close enough to matter
+            if (distanceNM(self.getLat(), self.getLon(),
+                           other.getLat(), other.getLon()) > PROXIMITY_NM) continue;
 
-            if (diff < ALTITUDE_BUFFER) {
+            if (Math.abs(other.getAltitude() - targetAlt) < ALTITUDE_BUFFER) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private double distanceNM(double lat1, double lon1, double lat2, double lon2) {
+        double dLat = (lat2 - lat1) * 60.0;
+        double dLon = (lon2 - lon1) * 60.0 * Math.cos(Math.toRadians(lat1));
+        return Math.sqrt(dLat * dLat + dLon * dLon);
     }
 }

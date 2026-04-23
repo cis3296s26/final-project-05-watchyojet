@@ -1,19 +1,19 @@
 package com.watchyojet.manager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.watchyojet.model.Aircraft;
 
 public class AircraftManager {
 
-    private Map<String, Aircraft> aircraftMap = new HashMap<>();
+    private Map<String, Aircraft> aircraftMap = new ConcurrentHashMap<>();
 
     public void syncWithLiveData(List<Aircraft> liveData) {
 
-        Map<String, Aircraft> updatedMap = new HashMap<>();
+        Map<String, Aircraft> updatedMap = new ConcurrentHashMap<>();
 
         for (Aircraft livePlane : liveData) {
 

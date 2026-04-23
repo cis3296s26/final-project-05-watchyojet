@@ -15,7 +15,8 @@ import com.watchyojet.model.AircraftType;
 
 public class OpenSkyFetcher {
     // We set a bounding box around Philadelphia International Airport (PHL)
-    private static final String OPENSKY_URL = "https://opensky-network.org/api/states/all?lamin=39.8&lomin=-75.3&lamax=40.0&lomax=-75.1";
+    // PHL TRACON area: ~60 NM radius around Philadelphia International (39.87N, 75.24W)
+    private static final String OPENSKY_URL = "https://opensky-network.org/api/states/all?lamin=38.8&lomin=-76.5&lamax=40.9&lomax=-74.0";
     
     private final HttpClient client;
     private final ObjectMapper mapper;

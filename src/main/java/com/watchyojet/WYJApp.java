@@ -24,7 +24,7 @@ public class WYJApp extends Application {
         System.out.println("Creating Window");
 
         WYJAppController controller = fxmlLoader.getController();
-        controller.handleThemeChange();
+        try { controller.handleThemeChange(); } catch (Exception ignored) {}
         controller.webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 // Start your Main.main thread ONLY now

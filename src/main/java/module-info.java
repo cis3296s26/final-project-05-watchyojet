@@ -15,4 +15,5 @@ module com.watchyojet {
     opens com.watchyojet.model to com.fasterxml.jackson.databind;
 
     exports com.watchyojet;
+    exports com.watchyojet.model;
 }

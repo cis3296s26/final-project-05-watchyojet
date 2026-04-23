@@ -1,5 +1,6 @@
 package com.watchyojet.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.watchyojet.WYJAppController;
@@ -24,68 +25,72 @@ public class ATCEngine {
 
     public void runCycle(List<Aircraft> aircrafts) {
 
-        System.out.println("\n--- ATC Cycle ---");
-        System.out.println("ATC Engine processing aircraft:");
-for (Aircraft a : aircrafts) {
-    System.out.println(a.getCallsign());
-}
-    
+        System.out.println("\n--- ATC Cycle | tracking " + aircrafts.size() + " aircraft ---");
 
-        //  Detect conflicts
+        // Detect conflicts based on the current state
         List<Conflict> conflicts = detector.detectConflicts(aircrafts);
+
+        // Update positions to simulate motion
         movement.updatePositions(aircrafts);
 
         if (conflicts.isEmpty()) {
             System.out.println("[STATUS] Airspace clear");
+            updateMap(aircrafts);
             return;
         }
 
-        // Resolve conflicts
+        notifyConflicts(conflicts);
+
+        List<Resolution> resolutions = new ArrayList<>();
+        List<String> resolvedAircraft = new ArrayList<>();
+        int unresolvedCount = 0;
+
+        // Evaluate resolutions while ensuring each aircraft is handled once per cycle
         for (Conflict c : conflicts) {
 
             Resolution r = resolver.resolveConflict(c, aircrafts);
 
-            if (r == null) continue;
+            if (r == null) {
+                unresolvedCount++;
+                continue;
+            }
 
-            Aircraft a = r.getAircraft();
-            a.setAltitude(r.getNewAltitude());
+            String callsign = r.getAircraft().getCallsign();
+
+            if (resolvedAircraft.contains(callsign)) {
+                continue;
+            }
+
+            resolutions.add(r);
+            resolvedAircraft.add(callsign);
         }
 
-        //UPDATE AIRCRAFT POSITIONS ON MAP
-       for (Aircraft aircraft : aircrafts) {
-    if (WYJAppController.getInstance() != null) {
-        WYJAppController.getInstance().updateMapPoint(
-                aircraft.getCallsign(),
-                aircraft.getLat(),
-                aircraft.getLon()
-        );
-    }
-}
-    }
-}
-
-
-/*
-        //FUTURE TESTING
-        double futureSeconds = 0.0003;
-        System.out.println("\n--------------\nSearching for conflict "+futureSeconds+" seconds into the future.");
-
-        List<Aircraft> futureAircraft = predictor.predict(aircrafts, futureSeconds);
-        List<Conflict> futureConflicts = detector.detectConflicts(futureAircraft);
-
-        if (futureConflicts.isEmpty()) {
-            System.out.println("No FUTURE conflicts");
-            return;
+        // Apply all valid resolutions together
+        for (Resolution r : resolutions) {
+            r.getAircraft().setAltitude(r.getNewAltitude());
         }
 
-        // Resolve conflicts
-        for (Conflict c : futureConflicts) {
+        if (resolutions.isEmpty()) {
+            System.out.println("[WARNING] Conflicts detected but no valid resolution found");
+        } else if (unresolvedCount > 0) {
+            System.out.println("[WARNING] Some conflicts remain unresolved");
+        }
 
-            Resolution r = resolver.resolveConflict(c, aircrafts);
+        updateMap(aircrafts);
+    }
 
-            if (r == null) continue;
+    private void notifyConflicts(List<Conflict> conflicts) {
+        WYJAppController ctrl = WYJAppController.getInstance();
+        if (ctrl == null) return;
+        for (Conflict c : conflicts) {
+            ctrl.markConflict(c.getA1().getCallsign(), c.getA2().getCallsign());
+            ctrl.logToMap("CONFLICT: " + c.getA1().getCallsign() + " / " + c.getA2().getCallsign());
+        }
+    }
 
-            Aircraft a = r.getAircraft();
-            a.setAltitude(r.getNewAltitude());
-        }*/
- 
+    private void updateMap(List<Aircraft> aircrafts) {
+        WYJAppController ctrl = WYJAppController.getInstance();
+        if (ctrl == null) return;
+        ctrl.updateAllAircraft(aircrafts);
+    }
+}

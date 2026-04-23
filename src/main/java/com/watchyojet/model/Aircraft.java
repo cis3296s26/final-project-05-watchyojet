@@ -81,8 +81,13 @@ public class Aircraft {
             double speed = this.getSpeed();
 
       if (alt < 1000 && speed < 150) return "TAKEOFF_LANDING";
-     if (alt < 3000) return "FINAL_APPROACH";
+     if (alt < 3000 && speed < 250) return "FINAL_APPROACH";
      if (alt < 10000) return "CLIMB_DESCENT";
      return "CRUISE";
 }
+
+public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
 }

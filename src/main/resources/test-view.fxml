@@ -57,21 +57,13 @@
    </MenuBar>
    <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
       <children>
-         <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+         <VBox maxHeight="1.7976931348623157E308" maxWidth="200.0" minWidth="150.0" prefWidth="200.0">
             <children>
-             <Button mnemonicParsing="false" text="Test Button 1">
+             <Button mnemonicParsing="false" text="&#215;" onAction="#handleClose"
+                        style="-fx-font-size:18px;-fx-padding:4 12;-fx-text-fill:#c8302c;-fx-background-color:transparent;-fx-border-color:#d9d3c8;-fx-border-radius:6;-fx-background-radius:6;"
+                        prefWidth="40" prefHeight="34">
                   <VBox.margin>
-                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                  </VBox.margin>
-               </Button>
-               <Button mnemonicParsing="false" text="Button2">
-                  <VBox.margin>
-                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                  </VBox.margin>
-               </Button>
-               <Button mnemonicParsing="false" text="Button3">
-                  <VBox.margin>
-                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     <Insets bottom="4.0" left="10.0" right="10.0" top="10.0" />
                   </VBox.margin>
                </Button>
             </children>
@@ -82,7 +74,7 @@
          <Pane maxHeight="1.7976931348623157E308" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" style="-fx-background-color: #3498db; -fx-border-color: #3498db;" />
       
           <!-- Add this line below -->
-          <WebView fx:id="webView" />
+          <WebView fx:id="webView" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" />
       </children>
    </HBox>
    <ListView fx:id="logList" prefHeight="200.0" prefWidth="200.0" stylesheets="@log-style.css" />

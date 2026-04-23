@@ -29,15 +29,6 @@ public class ConflictDetector {
                 double tCPA = timeToCPA(a1, a2);
                 double cpaDistance = distanceAtCPA(a1, a2);
 
-                // Debug CPA logging
-                if (tCPA > 0 && tCPA < MAX_LOOKAHEAD_SECONDS) {
-                    System.out.println(
-                            a1.getCallsign() + " vs " + a2.getCallsign()
-                                    + " | tCPA=" + String.format("%.0f", tCPA) + "s"
-                                    + " | dCPA=" + String.format("%.2f", cpaDistance)
-                    );
-                }
-
                 // Conflict condition
                 if (tCPA > 0 && tCPA < MAX_LOOKAHEAD_SECONDS
                         && cpaDistance < MIN_DISTANCE
@@ -71,33 +62,31 @@ public class ConflictDetector {
 
     private double timeToCPA(Aircraft a1, Aircraft a2) {
 
-        double latFactor = 60.0;
+        double avgLat = (a1.getLat() + a2.getLat()) / 2.0;
+        double cosLat = Math.cos(Math.toRadians(avgLat));
 
-        double x1 = a1.getLon() * latFactor;
-        double y1 = a1.getLat() * latFactor;
+        // Positions in NM: lat * 60, lon * 60 * cos(lat)
+        double x1 = a1.getLon() * 60.0 * cosLat;
+        double y1 = a1.getLat() * 60.0;
+        double x2 = a2.getLon() * 60.0 * cosLat;
+        double y2 = a2.getLat() * 60.0;
 
-        double x2 = a2.getLon() * latFactor;
-        double y2 = a2.getLat() * latFactor;
-
+        // Velocities in NM/hr
         double vx1 = a1.getSpeed() * Math.sin(Math.toRadians(a1.getHeading()));
-double vy1 = a1.getSpeed() * Math.cos(Math.toRadians(a1.getHeading()));
-
-double vx2 = a2.getSpeed() * Math.sin(Math.toRadians(a2.getHeading()));
-double vy2 = a2.getSpeed() * Math.cos(Math.toRadians(a2.getHeading()));
+        double vy1 = a1.getSpeed() * Math.cos(Math.toRadians(a1.getHeading()));
+        double vx2 = a2.getSpeed() * Math.sin(Math.toRadians(a2.getHeading()));
+        double vy2 = a2.getSpeed() * Math.cos(Math.toRadians(a2.getHeading()));
 
         double dvx = vx2 - vx1;
         double dvy = vy2 - vy1;
-
-        double dx = x2 - x1;
-        double dy = y2 - y1;
+        double dx  = x2 - x1;
+        double dy  = y2 - y1;
 
         double dv2 = dvx * dvx + dvy * dvy;
-
         if (dv2 == 0) return -1;
 
-        double t = -(dx * dvx + dy * dvy) / dv2;
-
-        return t * 3600.0;
+        double tHours = -(dx * dvx + dy * dvy) / dv2;
+        return tHours * 3600.0; // convert to seconds
     }
 
     private double distanceAtCPA(Aircraft a1, Aircraft a2) {

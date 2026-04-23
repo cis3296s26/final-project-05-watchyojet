@@ -21,7 +21,6 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>21</version>
-            <classifier>win</classifier>
         </dependency>
         <!-- JSON Parsing Dependency -->
         <dependency>
@@ -29,18 +28,16 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>21</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>21</version>
-            <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -65,7 +62,7 @@
                     <!-- Default configuration for running with: mvn clean javafx:run -->
                     <id>default-cli</id>
                     <configuration>
-                        <mainClass>com.watchyojet.App</mainClass>
+                        <mainClass>com.watchyojet/com.watchyojet.WYJApp</mainClass>
                         <launcher>app</launcher>
                         <jlinkZipName>app</jlinkZipName>
                         <jlinkImageName>app</jlinkImageName>

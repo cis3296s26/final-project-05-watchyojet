@@ -9,8 +9,8 @@ import com.watchyojet.model.Aircraft;
 
 public class Main {
 
-    private static long lastApiFetchTime = 0;
     private static final long API_COOLDOWN_MS = 12000;
+    private static long lastApiFetchTime = -API_COOLDOWN_MS;
 
     public static void main(String[] args) {
 
