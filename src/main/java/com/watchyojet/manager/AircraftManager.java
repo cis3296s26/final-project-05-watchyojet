@@ -15,31 +15,32 @@ public class AircraftManager {
 
         Map<String, Aircraft> updatedMap = new ConcurrentHashMap<>();
 
-        for (Aircraft livePlane : liveData) {
+        for (Aircraft live : liveData) {
 
-            String callsign = livePlane.getCallsign();
+            String callsign = live.getCallsign();
 
             if (aircraftMap.containsKey(callsign)) {
 
                 Aircraft existing = aircraftMap.get(callsign);
 
-                // Update dynamic properties from live data
-                existing.setLat(livePlane.getLat());
-                existing.setLon(livePlane.getLon());
-                existing.setHeading(livePlane.getHeading());
+                // Update position and movement from live data every refresh cycle.
+                existing.setLat(live.getLat());
+                existing.setLon(live.getLon());
+                existing.setHeading(live.getHeading());
+                existing.setSpeed(live.getSpeed()); // fix: keep speed current for accurate CPA
 
-                // Preserve simulated altitude (do not overwrite)
+                // Altitude is intentionally NOT overwritten: the simulation may have
+                // issued a resolution that changed the aircraft's assigned altitude.
+                // Overwriting with raw transponder data would undo ATC instructions.
 
                 updatedMap.put(callsign, existing);
 
             } else {
-
-                // New aircraft entering the airspace
-                updatedMap.put(callsign, livePlane);
+                // New aircraft entering the airspace — use all live values including altitude.
+                updatedMap.put(callsign, live);
             }
         }
 
-        // Replace old map with updated one
         aircraftMap = updatedMap;
     }
 

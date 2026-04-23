@@ -10,7 +10,9 @@ import com.watchyojet.model.Resolution;
 public class ResolutionEngine {
 
     private static final double ALTITUDE_STEP = 1000;
-    private static final double ALTITUDE_BUFFER = 500;
+    // ALTITUDE_BUFFER must equal SAFE_VERTICAL_SEPARATION so that any accepted
+    // slot is guaranteed to be ≥1000 ft from every other aircraft.
+    private static final double ALTITUDE_BUFFER = 1000;
     private static final double SAFE_VERTICAL_SEPARATION = 1000;
     private static final double MIN_ALTITUDE = 3000;
 
@@ -18,31 +20,34 @@ public class ResolutionEngine {
         return Math.round(altitude / 1000) * 1000;
     }
 
-    public Resolution resolveConflict(Conflict c, List<Aircraft> allAircraft) {
+    // Select which aircraft to move based on priority: EMERGENCY > MILITARY > default
+    private Aircraft selectAircraftToMove(Conflict c) {
+        Aircraft a1 = c.getA1();
+        Aircraft a2 = c.getA2();
+        if (a1.getCategory() == AircraftCategory.EMERGENCY) return a2;
+        if (a2.getCategory() == AircraftCategory.EMERGENCY) return a1;
+        if (a1.getCategory() == AircraftCategory.MILITARY)  return a2;
+        if (a2.getCategory() == AircraftCategory.MILITARY)  return a1;
+        return a1;
+    }
 
+    public Resolution resolveConflict(Conflict c, List<Aircraft> allAircraft) {
         Aircraft a1 = c.getA1();
         Aircraft a2 = c.getA2();
 
         double separation = Math.abs(a1.getAltitude() - a2.getAltitude());
+        if (separation >= SAFE_VERTICAL_SEPARATION) return null;
 
-        // Already safe → do nothing
-        if (separation >= SAFE_VERTICAL_SEPARATION) {
-            return null;
-        }
+        Aircraft toMove = selectAircraftToMove(c);
+        return resolveForAircraft(toMove, allAircraft);
+    }
 
-        // Decide which aircraft to move
-        Aircraft a = a1;
-
-        if (a1.getCategory() == AircraftCategory.EMERGENCY) {
-            a = a2;
-        } else if (a2.getCategory() == AircraftCategory.EMERGENCY) {
-            a = a1;
-        } else if (a1.getCategory() == AircraftCategory.MILITARY) {
-            a = a2;
-        }
+    // Exposed so ATCEngine can attempt the other aircraft when the primary is
+    // already resolved this cycle.
+    public Resolution resolveForAircraft(Aircraft a, List<Aircraft> allAircraft) {
 
         double currentAlt = a.getAltitude();
-        double maxAlt = a.getType().getMaxAltitude();
+        double maxAlt     = a.getType().getMaxAltitude();
 
         // Search ±1000 through ±15000 ft in 1000-ft steps, closest first
         double[] options = new double[30];
@@ -52,22 +57,16 @@ public class ResolutionEngine {
         }
 
         for (double alt : options) {
-
             alt = snapToFlightLevel(alt);
 
-            // Basic constraints
             if (alt > maxAlt) continue;
-            if (alt <= 0) continue;
+            if (alt <= 0)     continue;
 
-            // Flight phase logic
             String phase = a.getFlightPhase();
-
-            // Enroute aircraft must stay above safe minimum
             if (phase.equals("CRUISE") || phase.equals("CLIMB_DESCENT")) {
                 if (alt < MIN_ALTITUDE) continue;
             }
 
-            // Check if altitude is free
             if (!isAltitudeFree(alt, allAircraft, a)) continue;
 
             return new Resolution(a, alt);
@@ -79,20 +78,12 @@ public class ResolutionEngine {
     private static final double PROXIMITY_NM = 8.0;
 
     private boolean isAltitudeFree(double targetAlt, List<Aircraft> aircrafts, Aircraft self) {
-
         for (Aircraft other : aircrafts) {
-
             if (other == self) continue;
-
-            // Only check aircraft that are geographically close enough to matter
             if (distanceNM(self.getLat(), self.getLon(),
                            other.getLat(), other.getLon()) > PROXIMITY_NM) continue;
-
-            if (Math.abs(other.getAltitude() - targetAlt) < ALTITUDE_BUFFER) {
-                return false;
-            }
+            if (Math.abs(other.getAltitude() - targetAlt) < ALTITUDE_BUFFER) return false;
         }
-
         return true;
     }
 

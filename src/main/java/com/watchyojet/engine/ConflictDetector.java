@@ -8,7 +8,7 @@ import com.watchyojet.model.Conflict;
 
 public class ConflictDetector {
 
-    private static final double MIN_DISTANCE = 3.0; // nautical miles (standard TRACON)
+    private static final double MIN_DISTANCE = 3.0;          // nautical miles (TRACON standard)
     private static final double MAX_LOOKAHEAD_SECONDS = 120.0; // 2 minutes
 
     public List<Conflict> detectConflicts(List<Aircraft> aircrafts) {
@@ -22,16 +22,16 @@ public class ConflictDetector {
                 Aircraft a2 = aircrafts.get(j);
 
                 double altitudeDiff = Math.abs(
-                        Math.round(a1.getAltitude()) - Math.round(a2.getAltitude())
-                );
+                        Math.round(a1.getAltitude()) - Math.round(a2.getAltitude()));
 
+                // Compute tCPA once and reuse — avoids 3× redundant calls per pair.
                 double tCPA = timeToCPA(a1, a2);
-                double cpaDistance = distanceAtCPA(a1, a2);
 
-                // Conflict condition
-                if (tCPA > 0 && tCPA < MAX_LOOKAHEAD_SECONDS
-                        && cpaDistance < MIN_DISTANCE
-                        && altitudeDiff < 1000) {
+                if (tCPA <= 0 || tCPA >= MAX_LOOKAHEAD_SECONDS) continue;
+
+                double cpaDistance = distanceAtCPA(a1, a2, tCPA);
+
+                if (cpaDistance < MIN_DISTANCE && altitudeDiff < 1000) {
 
                     conflicts.add(new Conflict(a1, a2));
 
@@ -43,7 +43,6 @@ public class ConflictDetector {
                     System.out.println("→ dCPA: " + String.format("%.2f", cpaDistance) + " NM");
                     System.out.println("→ Altitude diff: " + String.format("%.0f", altitudeDiff) + " ft");
                     System.out.println("→ Severity: " + severity);
-
                 }
             }
         }
@@ -51,20 +50,20 @@ public class ConflictDetector {
         return conflicts;
     }
 
-    // ---------------- CPA CALCULATIONS ----------------
+    // ── CPA CALCULATIONS ────────────────────────────────────────────────────
 
     private double timeToCPA(Aircraft a1, Aircraft a2) {
 
         double avgLat = (a1.getLat() + a2.getLat()) / 2.0;
         double cosLat = Math.cos(Math.toRadians(avgLat));
 
-        // Positions in NM: lat * 60, lon * 60 * cos(lat)
+        // Positions in NM using equirectangular projection
         double x1 = a1.getLon() * 60.0 * cosLat;
         double y1 = a1.getLat() * 60.0;
         double x2 = a2.getLon() * 60.0 * cosLat;
         double y2 = a2.getLat() * 60.0;
 
-        // Velocities in NM/hr
+        // Velocities in NM/hr (knots)
         double vx1 = a1.getSpeed() * Math.sin(Math.toRadians(a1.getHeading()));
         double vy1 = a1.getSpeed() * Math.cos(Math.toRadians(a1.getHeading()));
         double vx2 = a2.getSpeed() * Math.sin(Math.toRadians(a2.getHeading()));
@@ -76,36 +75,32 @@ public class ConflictDetector {
         double dy  = y2 - y1;
 
         double dv2 = dvx * dvx + dvy * dvy;
+        // Parallel tracks — no convergence, no conflict via CPA
         if (dv2 == 0) return -1;
 
         double tHours = -(dx * dvx + dy * dvy) / dv2;
-        return tHours * 3600.0; // convert to seconds
+        return tHours * 3600.0; // → seconds
     }
 
-    private double distanceAtCPA(Aircraft a1, Aircraft a2) {
+    // Accept pre-computed tCPA to avoid redundant recalculation.
+    private double distanceAtCPA(Aircraft a1, Aircraft a2, double tCPA) {
 
-        double t = timeToCPA(a1, a2);
-
-        if (t < 0 || t > MAX_LOOKAHEAD_SECONDS) return Double.MAX_VALUE;
-
-        double[] p1 = TrajectoryPredictor.predictPosition(a1, t);
-        double[] p2 = TrajectoryPredictor.predictPosition(a2, t);
+        double[] p1 = TrajectoryPredictor.predictPosition(a1, tCPA);
+        double[] p2 = TrajectoryPredictor.predictPosition(a2, tCPA);
 
         return distanceNM(p1[0], p1[1], p2[0], p2[1]);
     }
 
     private double distanceNM(double lat1, double lon1, double lat2, double lon2) {
-
+        double avgLat = (lat1 + lat2) / 2.0;
         double dLat = (lat2 - lat1) * 60.0;
-        double dLon = (lon2 - lon1) * 60.0 * Math.cos(Math.toRadians(lat1));
-
+        double dLon = (lon2 - lon1) * 60.0 * Math.cos(Math.toRadians(avgLat));
         return Math.sqrt(dLat * dLat + dLon * dLon);
     }
 
     private String classifySeverity(double distance, double altDiff) {
-
         if (distance < 1.0 && altDiff < 500) return "CRITICAL";
-        else if (distance < 3.0) return "HIGH";
-        else return "MEDIUM";
+        else if (distance < 3.0)             return "HIGH";
+        else                                  return "MEDIUM";
     }
 }
