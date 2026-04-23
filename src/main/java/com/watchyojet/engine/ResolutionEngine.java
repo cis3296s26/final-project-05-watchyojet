@@ -44,9 +44,9 @@ public class ResolutionEngine {
         double currentAlt = a.getAltitude();
         double maxAlt = a.getType().getMaxAltitude();
 
-        // Search ±1000 through ±8000 ft in 1000-ft steps, closest first
-        double[] options = new double[16];
-        for (int k = 0; k < 8; k++) {
+        // Search ±1000 through ±15000 ft in 1000-ft steps, closest first
+        double[] options = new double[30];
+        for (int k = 0; k < 15; k++) {
             options[k * 2]     = currentAlt + (k + 1) * ALTITUDE_STEP;
             options[k * 2 + 1] = currentAlt - (k + 1) * ALTITUDE_STEP;
         }
@@ -70,20 +70,13 @@ public class ResolutionEngine {
             // Check if altitude is free
             if (!isAltitudeFree(alt, allAircraft, a)) continue;
 
-            // ✅ RESOLUTION FOUND
-            System.out.println("[RESOLUTION]");
-            System.out.println("→ Aircraft: " + a.getCallsign());
-            System.out.println("→ New altitude: " + alt + " ft");
-
             return new Resolution(a, alt);
         }
 
-        // ❌ No valid altitude found
-        System.out.println("⚠ No safe altitude found for " + a.getCallsign());
         return null;
     }
 
-    private static final double PROXIMITY_NM = 60.0;
+    private static final double PROXIMITY_NM = 8.0;
 
     private boolean isAltitudeFree(double targetAlt, List<Aircraft> aircrafts, Aircraft self) {
 

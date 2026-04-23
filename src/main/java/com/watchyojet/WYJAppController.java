@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.application.Platform;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.List;
@@ -81,7 +82,8 @@ public class WYJAppController {
 
     @FXML
     public void handleClose() {
-        Platform.exit();
+        Stage stage = (Stage) topContainer.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -121,21 +123,59 @@ public class WYJAppController {
 
     public void markConflict(String cs1, String cs2) {
         Platform.runLater(() -> {
-            Object check = webEngine.executeScript("typeof markConflict !== 'undefined'");
-            if (check.equals(true)) {
-                String s1 = cs1.replace("'", "\\'"), s2 = cs2.replace("'", "\\'");
-                webEngine.executeScript(String.format("markConflict('%s','%s')", s1, s2));
-            }
+            try {
+                Object check = webEngine.executeScript("typeof markConflict !== 'undefined'");
+                if (check.equals(true)) {
+                    String s1 = cs1.replace("'", "\\'"), s2 = cs2.replace("'", "\\'");
+                    webEngine.executeScript(String.format("markConflict('%s','%s')", s1, s2));
+                }
+            } catch (Exception ignored) {}
+        });
+    }
+
+    // Single Platform.runLater per ATC cycle for all conflict/resolution updates
+    public void batchNotify(List<String[]> conflictPairs, List<String[]> resolvedPairs) {
+        if (conflictPairs.isEmpty()) return;
+        Platform.runLater(() -> {
+            try {
+                Object check = webEngine.executeScript("typeof markConflict !== 'undefined'");
+                if (!check.equals(true)) return;
+
+                // Mark active conflicts
+                for (String[] pair : conflictPairs) {
+                    String s1 = pair[0].replace("'", "\\'");
+                    String s2 = pair[1].replace("'", "\\'");
+                    webEngine.executeScript(String.format("markConflict('%s','%s')", s1, s2));
+                }
+
+                // Mark resolved conflicts — pass moved aircraft + new altitude
+                if (!resolvedPairs.isEmpty()) {
+                    for (String[] pair : resolvedPairs) {
+                        String s1 = pair[0].replace("'", "\\'");
+                        String s2 = pair[1].replace("'", "\\'");
+                        String movedCs = pair.length > 2 ? pair[2].replace("'", "\\'") : "";
+                        String newAlt  = pair.length > 3 ? pair[3] : "0";
+                        webEngine.executeScript(String.format(
+                            "typeof markResolved !== 'undefined' && markResolved('%s','%s','%s',%s)",
+                            s1, s2, movedCs, newAlt));
+                    }
+                    String msg = "✓ " + resolvedPairs.size() + " conflict(s) resolved";
+                    webEngine.executeScript(String.format(
+                        "typeof logATCEvent !== 'undefined' && logATCEvent('%s')", msg));
+                }
+            } catch (Exception ignored) {}
         });
     }
 
     public void logToMap(String message) {
         Platform.runLater(() -> {
-            Object check = webEngine.executeScript("typeof logATCEvent !== 'undefined'");
-            if (check.equals(true)) {
-                String safe = message.replace("'", "\\'").replace("\n", " ");
-                webEngine.executeScript(String.format("logATCEvent('%s')", safe));
-            }
+            try {
+                Object check = webEngine.executeScript("typeof logATCEvent !== 'undefined'");
+                if (check.equals(true)) {
+                    String safe = message.replace("'", "\\'").replace("\n", " ");
+                    webEngine.executeScript(String.format("logATCEvent('%s')", safe));
+                }
+            } catch (Exception ignored) {}
         });
     }
 

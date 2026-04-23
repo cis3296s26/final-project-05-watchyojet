@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -424,8 +425,8 @@
   /* ===== CONFLICT PANEL ===== */
   .conflict-item {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 3px;
     padding: 8px 10px;
     background: rgba(200, 48, 44, 0.08);
     border: 1px solid rgba(200, 48, 44, 0.25);
@@ -451,6 +452,26 @@
   @keyframes conflict-pulse {
     from { border-color: rgba(200,48,44,0.2); }
     to   { border-color: rgba(200,48,44,0.7); }
+  }
+  .resolved-item {
+    background: rgba(46,139,87,0.08);
+    border-color: rgba(46,139,87,0.3);
+    color: var(--ok);
+    animation: none;
+  }
+  .resolved-tag {
+    background: var(--ok) !important;
+  }
+  .conflict-item .conflict-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .resolution-detail {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ok);
+    padding-left: 4px;
+    opacity: 0.85;
+    letter-spacing: 0.02em;
   }
 
   /* ===== FOOTER ===== */
@@ -1016,6 +1037,59 @@ function seedEnrouteAircraft() {
 function seedGroundAircraft(airport) {
   const out = [];
   const [alon, alat] = airport.pos;
+
+  // PHL-specific seeding: aircraft aligned to real runway positions/headings
+  if (airport.icao === 'KPHL') {
+    const slots = [
+      // Landing on 27R (south runway, approach from east, heading 267°)
+      { lon: alon+0.030, lat: alat-0.006, hdg: 267, status:"descent", spd:145, role:"landing",  gate:"A" },
+      // Landing on 27L (north runway, heading 267°)
+      { lon: alon+0.026, lat: alat+0.005, hdg: 267, status:"descent", spd:138, role:"landing",  gate:"B" },
+      // Landing on 35  (crosswind, heading 350°)
+      { lon: alon-0.021, lat: alat+0.016, hdg: 350, status:"descent", spd:120, role:"landing",  gate:"F" },
+      // Holding for takeoff on 09L (west end south runway)
+      { lon: alon-0.022, lat: alat-0.006, hdg:  87, status:"ground",  spd:  0, role:"holding",  gate:"C" },
+      // Takeoff roll 09R
+      { lon: alon-0.014, lat: alat+0.005, hdg:  87, status:"climb",   spd:155, role:"takeoff",  gate:"D" },
+      // Taxi heading east on taxiway A
+      { lon: alon-0.010, lat: alat-0.0005,hdg:  87, status:"ground",  spd: 22, role:"taxi",     gate:"C" },
+      // Taxi heading west on taxiway B
+      { lon: alon+0.006, lat: alat+0.003, hdg: 267, status:"ground",  spd: 18, role:"taxi",     gate:"A" },
+      // Taxi heading south (cross-taxiway)
+      { lon: alon+0.002, lat: alat+0.003, hdg: 180, status:"ground",  spd: 14, role:"taxi",     gate:"B" },
+      // Taxi heading north
+      { lon: alon-0.004, lat: alat-0.003, hdg:   0, status:"ground",  spd: 12, role:"taxi",     gate:"D" },
+      // Pushback from Terminal B gate
+      { lon: alon+0.005, lat: alat+0.002, hdg: 200, status:"ground",  spd:  5, role:"pushback", gate:"B" },
+      // Pushback from Terminal D gate
+      { lon: alon-0.007, lat: alat+0.002, hdg: 180, status:"ground",  spd:  4, role:"pushback", gate:"D" },
+      // Parked at Terminal A
+      { lon: alon+0.009, lat: alat+0.006, hdg: 267, status:"ground",  spd:  0, role:"holding",  gate:"A" },
+      // Emergency vehicle patrolling
+      { lon: alon-0.005, lat: alat-0.002, hdg:  45, status:"emergency",spd: 35, role:"emrgveh", gate:"" },
+    ];
+    slots.forEach(s => {
+      const isEV = s.role === 'emrgveh';
+      out.push({
+        id: nextAcId++,
+        callsign: isEV ? "RESCUE" + Math.floor(1+Math.random()*9) : randCS(),
+        type: isEV ? "FIRE" : AC_TYPES[Math.floor(Math.random()*AC_TYPES.length)],
+        lon: s.lon + (Math.random()-0.5)*0.001,
+        lat: s.lat + (Math.random()-0.5)*0.001,
+        alt: 0,
+        spd: s.spd,
+        hdg: s.hdg,
+        status: s.status,
+        route: isEV ? "AIRPORT PATROL" : `GATE ${s.gate}${Math.floor(1+Math.random()*20)} → RWY`,
+        squawk: isEV ? "----" : String(Math.floor(1000 + Math.random()*6000)),
+        groundRole: s.role,
+        onGround: true,
+      });
+    });
+    return out;
+  }
+
+  // Generic seeding for all other airports
   const roles = [
     { role: "takeoff",  status: "climb",  spd: () => 120 + Math.random()*50 },
     { role: "takeoff",  status: "climb",  spd: () => 140 + Math.random()*40 },
@@ -1104,7 +1178,7 @@ function resizeCanvas() {
   state.width = rect.width;
   state.height = rect.height;
 }
-window.addEventListener('resize', () => { resizeCanvas(); updateViewForLevel(); draw(); });
+window.addEventListener('resize', () => { resizeCanvas(); updateViewForLevel(); _needsRedraw = true; _cachedVisible = null; });
 
 // ---------- VIEW MGMT ----------
 function updateViewForLevel() {
@@ -1141,7 +1215,7 @@ function goToLevel(newLevel) {
   updateUIForLevel();
   renderSidebar();
   renderAircraftDetail();
-  draw();
+  _needsRedraw = true; _cachedVisible = null;
 }
 
 function updateUIForLevel() {
@@ -1326,7 +1400,7 @@ function selectAirport(a) {
 function selectAircraft(id) {
   state.selectedAircraftId = id;
   renderAircraftDetail();
-  draw();
+  _needsRedraw = true;
 }
 
 // ---------- RENDERING ----------
@@ -1609,6 +1683,181 @@ function drawAirportGround(a) {
   ctx.restore();
 }
 
+// ── PHL-specific detailed ground diagram ──
+function drawPHLGround(a) {
+  const [alon, alat] = a.pos;
+
+  function pt(dlon, dlat) { return project(alon + dlon, alat + dlat); }
+
+  function drawRwy(dlon1, dlat1, dlon2, dlat2, widthPx, labelW, labelE) {
+    const p1 = pt(dlon1, dlat1), p2 = pt(dlon2, dlat2);
+    if (!p1 || !p2) return;
+    const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+    const len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    const nx = -dy/len * widthPx/2, ny = dx/len * widthPx/2;
+    ctx.fillStyle = "#22252e";
+    ctx.beginPath();
+    ctx.moveTo(p1[0]-nx, p1[1]-ny); ctx.lineTo(p2[0]-nx, p2[1]-ny);
+    ctx.lineTo(p2[0]+nx, p2[1]+ny); ctx.lineTo(p1[0]+nx, p1[1]+ny);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#ffd84d"; ctx.lineWidth = 1.5; ctx.setLineDash([14, 10]);
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p1[0]-nx*0.88, p1[1]-ny*0.88); ctx.lineTo(p1[0]+nx*0.88, p1[1]+ny*0.88);
+    ctx.moveTo(p2[0]-nx*0.88, p2[1]-ny*0.88); ctx.lineTo(p2[0]+nx*0.88, p2[1]+ny*0.88);
+    ctx.stroke();
+    const angle = Math.atan2(dy, dx);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 10px 'JetBrains Mono',monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.save(); ctx.translate(p1[0]+Math.cos(angle)*20, p1[1]+Math.sin(angle)*20); ctx.rotate(angle+Math.PI/2); ctx.fillText(labelW, 0, 0); ctx.restore();
+    ctx.save(); ctx.translate(p2[0]-Math.cos(angle)*20, p2[1]-Math.sin(angle)*20); ctx.rotate(angle-Math.PI/2); ctx.fillText(labelE, 0, 0); ctx.restore();
+  }
+
+  function drawTwy(dlon1, dlat1, dlon2, dlat2) {
+    const p1 = pt(dlon1, dlat1), p2 = pt(dlon2, dlat2);
+    if (!p1 || !p2) return;
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+  }
+
+  function fillBox(dlon1, dlat1, dlon2, dlat2, color) {
+    const p1 = pt(dlon1, dlat1), p2 = pt(dlon2, dlat2);
+    if (!p1 || !p2) return;
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.min(p1[0],p2[0]), Math.min(p1[1],p2[1]),
+                 Math.abs(p2[0]-p1[0]), Math.abs(p2[1]-p1[1]));
+  }
+
+  function strokeBox(dlon1, dlat1, dlon2, dlat2) {
+    const p1 = pt(dlon1, dlat1), p2 = pt(dlon2, dlat2);
+    if (!p1 || !p2) return;
+    ctx.strokeRect(Math.min(p1[0],p2[0]), Math.min(p1[1],p2[1]),
+                   Math.abs(p2[0]-p1[0]), Math.abs(p2[1]-p1[1]));
+  }
+
+  function lbl(dlon, dlat, text, color, font) {
+    const p = pt(dlon, dlat);
+    if (!p) return;
+    ctx.fillStyle = color || "#1a1d24";
+    ctx.font = font || "bold 10px 'JetBrains Mono',monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, p[0], p[1]);
+  }
+
+  ctx.save();
+
+  // ── Airport boundary / grass ──
+  fillBox(-0.030, +0.014, +0.028, -0.013, "#c6ceaa");
+
+  // Grass strip between parallel runways
+  fillBox(-0.022, +0.004, +0.022, -0.006, "#b9c59d");
+
+  // ── Concrete apron areas ──
+  fillBox(-0.016, +0.0038, +0.013, -0.001, "#aab49f"); // main ramp between terminals
+  fillBox(-0.021, +0.004,  -0.016, +0.001, "#a8b29e"); // west apron / south apron
+  fillBox(+0.013, +0.001,  +0.024, -0.005, "#a8b29e"); // east cargo / west deicing apron
+
+  // ── Taxiways ──
+  ctx.strokeStyle = "#8a9a82"; ctx.lineWidth = 6;
+  // Taxiway A (main E-W spine, south of 09R between both runways)
+  drawTwy(-0.022, +0.001, +0.022, +0.001);
+  // Taxiway K (parallel south of A)
+  drawTwy(-0.022, -0.001, +0.022, -0.001);
+  // Taxiway B (north of 09R)
+  drawTwy(-0.017, +0.008, +0.017, +0.008);
+  // N-S connectors
+  ctx.lineWidth = 5;
+  for (const dx of [-0.016, -0.012, -0.006, 0.000, +0.006, +0.012, +0.018]) {
+    drawTwy(dx, +0.009, dx, -0.007);
+  }
+  // West connector to 17/35
+  drawTwy(-0.016, +0.001, -0.021, +0.001);
+  drawTwy(-0.021, +0.009, -0.021, -0.007);
+  // Hold-short bars (east ends)
+  ctx.lineWidth = 4;
+  drawTwy(+0.022, -0.006, +0.025, -0.006);
+  drawTwy(+0.017, +0.006, +0.020, +0.006);
+
+  // ── Runway 09R/27L — north parallel, 9,500 × 150 ft, 087.3° ──
+  drawRwy(-0.017, +0.006, +0.017, +0.006, 26, "09R", "27L");
+
+  // ── Runway 09L/27R — south parallel, 12,000 × 200 ft, 087.3° ──
+  drawRwy(-0.022, -0.006, +0.022, -0.006, 34, "09L", "27R");
+
+  // ── Runway 08/26 — middle short, 6,500 × 150 ft, 087° ──
+  // Positioned between the parallels on the west side (per FAA diagram)
+  drawRwy(-0.021, +0.000, -0.002, +0.000, 20, "08", "26");
+
+  // ── Runway 17/35 — crosswind, 5,001 × 150 ft, heading 170.9° ──
+  // Crosses through 09R area on west side; slight eastward drift (170.9° ≈ S-SE)
+  drawRwy(-0.016, +0.010, -0.014, -0.004, 18, "35", "17");
+
+  // ── Terminal complex (between the parallel runways) ──
+  ctx.strokeStyle = "#c8cdc0"; ctx.lineWidth = 1;
+
+  // Terminal A East + A West (horseshoe shape, northeast section)
+  fillBox(+0.004, +0.005, +0.012, +0.002, "#555e6a");
+  strokeBox(+0.004, +0.005, +0.012, +0.002);
+  lbl(+0.008, +0.0035, "A EAST", "#fff", "bold 7px 'JetBrains Mono',monospace");
+
+  fillBox(-0.004, +0.005, +0.004, +0.002, "#555e6a");
+  strokeBox(-0.004, +0.005, +0.004, +0.002);
+  lbl(+0.000, +0.0035, "A WEST", "#fff", "bold 7px 'JetBrains Mono',monospace");
+
+  // Terminal B (center)
+  fillBox(+0.001, +0.002, +0.009, -0.001, "#555e6a");
+  strokeBox(+0.001, +0.002, +0.009, -0.001);
+  lbl(+0.005, +0.0005, "B", "#fff", "bold 8px 'JetBrains Mono',monospace");
+
+  // Terminal C
+  fillBox(-0.005, +0.002, +0.001, -0.001, "#555e6a");
+  strokeBox(-0.005, +0.002, +0.001, -0.001);
+  lbl(-0.002, +0.0005, "C", "#fff", "bold 8px 'JetBrains Mono',monospace");
+
+  // Terminal D
+  fillBox(-0.011, +0.002, -0.005, -0.001, "#555e6a");
+  strokeBox(-0.011, +0.002, -0.005, -0.001);
+  lbl(-0.008, +0.0005, "D", "#fff", "bold 8px 'JetBrains Mono',monospace");
+
+  // Terminal E (south wing)
+  fillBox(+0.002, -0.001, +0.010, -0.004, "#4d5762");
+  strokeBox(+0.002, -0.001, +0.010, -0.004);
+  lbl(+0.006, -0.0025, "E", "#fff", "bold 8px 'JetBrains Mono',monospace");
+
+  // Terminal F (south-west)
+  fillBox(-0.007, -0.001, +0.002, -0.004, "#4d5762");
+  strokeBox(-0.007, -0.001, +0.002, -0.004);
+  lbl(-0.0025, -0.0025, "F", "#fff", "bold 8px 'JetBrains Mono',monospace");
+
+  // FBO / North Apron terminal (far west)
+  fillBox(-0.021, +0.009, -0.016, +0.006, "#3f4a55");
+  strokeBox(-0.021, +0.009, -0.016, +0.006);
+  lbl(-0.0185, +0.0075, "FBO", "#ccc", "bold 7px 'JetBrains Mono',monospace");
+
+  // TWR marker
+  const pTwr = pt(+0.016, +0.003);
+  if (pTwr) {
+    ctx.fillStyle = "#c8302c"; ctx.font = "bold 8px 'JetBrains Mono',monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("TWR", pTwr[0], pTwr[1]);
+  }
+
+  // Airport label
+  const pLabel = pt(+0.014, -0.012);
+  if (pLabel) {
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.fillRect(pLabel[0]-38, pLabel[1]-8, 148, 16);
+    ctx.fillStyle = "#2e3528";
+    ctx.font = "bold 10px 'JetBrains Mono',monospace";
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillText("PHL  PHILADELPHIA INTL", pLabel[0]-34, pLabel[1]);
+  }
+
+  ctx.restore();
+}
+
 function aircraftColor(a) {
   if (a.status === "emergency") return "#c8302c";
   if (a.status === "climb")     return "#e0a800";
@@ -1660,13 +1909,15 @@ function drawAircraft(a) {
     ctx.restore();
   }
 
-  // Callsign label — always visible
+  // At globe level skip labels for non-selected/hovered aircraft (big perf win)
+  if (state.level === 0 && !selected && !hovered) return;
+
   const label = a.callsign;
   ctx.save();
   ctx.font = "600 10px 'JetBrains Mono', monospace";
   ctx.textAlign = "left"; ctx.textBaseline = "top";
   const labelX = p[0] + 10, labelY = p[1] - 6;
-  const tw = ctx.measureText(label).width;
+  const tw = label.length * 6.2; // estimate avoids expensive measureText()
   const h = showTelemetry ? 36 : 14;
   ctx.fillStyle = "rgba(255,255,255,0.92)";
   ctx.fillRect(labelX - 2, labelY - 1, tw + 6, h);
@@ -1692,7 +1943,11 @@ function draw() {
     for (const c of COUNTRIES) if (c.polys) drawCountryLabel(c);
   } else if (state.level === 4) {
     ctx.fillStyle = "#d4dbc2"; ctx.fillRect(0, 0, state.width, state.height);
-    drawAirportGround(state.selectedAirport);
+    if (state.selectedAirport && state.selectedAirport.icao === 'KPHL') {
+      drawPHLGround(state.selectedAirport);
+    } else {
+      drawAirportGround(state.selectedAirport);
+    }
   } else {
     // Flat map background
     ctx.fillStyle = "#c9d8e6"; ctx.fillRect(0, 0, state.width, state.height);
@@ -1731,7 +1986,10 @@ function draw() {
   const visible = getVisibleAircraft();
   for (const a of visible) drawAircraft(a);
 
-  // Stats
+}
+
+function _updateStats() {
+  const visible = getVisibleAircraft();
   document.getElementById('visibleCount').textContent = visible.length;
   document.getElementById('zoomLabel').textContent = (state.view.scale / (state.width*0.05)).toFixed(1) + "×";
   document.getElementById('statTracked').textContent = visible.length;
@@ -1782,9 +2040,16 @@ canvas.addEventListener('mousemove', (e) => {
       state.view.cy += dy / state.view.scale;
     }
     state.lastMouse = m;
-    draw();
+    _needsRedraw = true; _cachedVisible = null;
     return;
   }
+
+  // Snapshot old hover state to detect changes
+  const _prevAcId      = state.hoverAircraftId;
+  const _prevCountry   = state.hoveredCountry;
+  const _prevState2    = state.hoveredState;
+  const _prevARTCC     = state.hoveredARTCC;
+  const _prevAirport   = state.hoveredAirport;
 
   state.hoveredCountry = null; state.hoveredState = null;
   state.hoveredARTCC = null; state.hoveredAirport = null; state.hoverAircraftId = null;
@@ -1833,7 +2098,12 @@ canvas.addEventListener('mousemove', (e) => {
   }
 
   canvas.style.cursor = (state.hoveredCountry || state.hoveredState || state.hoveredARTCC || state.hoveredAirport || state.hoverAircraftId) ? "pointer" : "grab";
-  draw();
+  // Only redraw if something actually changed — moving over empty space costs nothing
+  if (state.hoverAircraftId !== _prevAcId || state.hoveredCountry !== _prevCountry ||
+      state.hoveredState !== _prevState2 || state.hoveredARTCC !== _prevARTCC ||
+      state.hoveredAirport !== _prevAirport) {
+    _needsRedraw = true;
+  }
 });
 
 canvas.addEventListener('click', (e) => {
@@ -1851,19 +2121,19 @@ canvas.addEventListener('click', (e) => {
   if (state.level === 3 && state.hoveredAirport) { selectAirport(state.hoveredAirport); return; }
   state.selectedAircraftId = null;
   renderAircraftDetail();
-  draw();
+  _needsRedraw = true; _cachedVisible = null;
 });
 
 canvas.addEventListener('wheel', (e) => {
   e.preventDefault();
   const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
   state.view.scale *= factor;
-  draw();
+  _needsRedraw = true; _cachedVisible = null;
 }, { passive: false });
 
-document.getElementById('zoomIn').addEventListener('click', () => { state.view.scale *= 1.2; draw(); });
-document.getElementById('zoomOut').addEventListener('click', () => { state.view.scale /= 1.2; draw(); });
-document.getElementById('resetView').addEventListener('click', () => { updateViewForLevel(); draw(); });
+document.getElementById('zoomIn').addEventListener('click', () => { state.view.scale *= 1.2; _needsRedraw = true; _cachedVisible = null; });
+document.getElementById('zoomOut').addEventListener('click', () => { state.view.scale /= 1.2; _needsRedraw = true; _cachedVisible = null; });
+document.getElementById('resetView').addEventListener('click', () => { updateViewForLevel(); _needsRedraw = true; _cachedVisible = null; });
 
 // ---------- RIGHT PANEL ----------
 function renderAircraftDetail() {
@@ -1944,10 +2214,36 @@ function tickAircraftPositions() {
   }
 }
 
-function tick() {
-  tickAircraftPositions();
-  draw();
-  if (state.selectedAircraftId) renderAircraftDetail();
+// RAF render loop — replaces setInterval(tick, 300)
+let _rafLastSim = 0;
+let _rafLastDetail = 0;
+let _needsRedraw = true;   // dirty flag: draw only when something changed
+let _cachedVisible = null; // per-frame cache for getVisibleAircraft()
+
+function _rafLoop(ts) {
+  // Apply buffered live data — returns true when data changed
+  if (_flushLiveBuffer()) _needsRedraw = true;
+
+  // Simulation physics at 300ms cadence
+  if (ts - _rafLastSim >= 300) {
+    tickAircraftPositions();
+    _rafLastSim = ts;
+    _needsRedraw = true;
+  }
+
+  if (_needsRedraw) {
+    _cachedVisible = null; // invalidate per-frame cache
+    draw();
+    _needsRedraw = false;
+  }
+
+  // Detail panel at 600ms — only when an aircraft is selected
+  if (state.selectedAircraftId && ts - _rafLastDetail >= 600) {
+    renderAircraftDetail();
+    _rafLastDetail = ts;
+  }
+
+  requestAnimationFrame(_rafLoop);
 }
 
 function updateClock() {
@@ -1956,6 +2252,7 @@ function updateClock() {
   const mm = String(d.getUTCMinutes()).padStart(2,'0');
   const ss = String(d.getUTCSeconds()).padStart(2,'0');
   document.getElementById('clockUTC').textContent = `${hh}:${mm}:${ss} UTC`;
+  _updateStats();
 }
 
 // ---------- INIT ----------
@@ -1970,7 +2267,7 @@ function init() {
   renderSidebar();
   renderAircraftDetail();
   draw();
-  setInterval(tick, 300);
+  requestAnimationFrame(_rafLoop);
   setInterval(updateClock, 1000);
   updateClock();
 }
@@ -1979,9 +2276,22 @@ init();
 
 // ===== JAVA BRIDGE INTEGRATION =====
 const liveAircraftMap = new Map();
-const conflictSet = new Set();
+const conflictSet = new Set();   // active conflicts: "CS1|CS2"
+const resolvedSet = new Map();   // recently resolved: "CS1|CS2" → timestamp
+
+// Pending buffer — Java writes here; RAF applies it at the next frame boundary
+let _pendingLiveArr = null;
 
 function batchUpdateAircraft(arr) {
+  // Just store; _flushLiveBuffer() will apply it at the start of the next frame
+  _pendingLiveArr = arr;
+}
+
+function _flushLiveBuffer() {
+  if (_pendingLiveArr === null) return false;
+  const arr = _pendingLiveArr;
+  _pendingLiveArr = null;
+
   const now = Date.now();
   for (const d of arr) {
     const status = d.alt > 10000 ? 'cruise' : d.alt > 3000 ? 'climb' : d.alt > 1000 ? 'descent' : 'ground';
@@ -2008,10 +2318,13 @@ function batchUpdateAircraft(arr) {
       });
     }
   }
+  // Evict aircraft not seen in 30s
   for (const cs of [...liveAircraftMap.keys()])
     if (now - liveAircraftMap.get(cs).lastSeen > 30000) liveAircraftMap.delete(cs);
+
   const liveEl = document.getElementById('liveCount');
   if (liveEl) liveEl.textContent = liveAircraftMap.size;
+  return true;
 }
 
 function renderConflictPanel() {
@@ -2019,20 +2332,47 @@ function renderConflictPanel() {
   const list = document.getElementById('conflictList');
   const countEl = document.getElementById('conflictCount');
   if (!section || !list || !countEl) return;
-  if (conflictSet.size === 0) { section.style.display = 'none'; return; }
+
+  // Expire resolved entries after 12 seconds
+  const now = Date.now();
+  for (const [k, v] of resolvedSet) if (now - v.ts > 12000) resolvedSet.delete(k);
+
+  const hasActive = conflictSet.size > 0;
+  const hasResolved = resolvedSet.size > 0;
+
+  if (!hasActive && !hasResolved) { section.style.display = 'none'; return; }
   section.style.display = '';
   countEl.textContent = conflictSet.size;
-  list.innerHTML = Array.from(conflictSet).map(key => {
+
+  const activeHtml = Array.from(conflictSet).map(key => {
     const [cs1, cs2] = key.split('|');
-    return `<div class="conflict-item"><span class="alert-tag">ALERT</span>${cs1} ↔ ${cs2}</div>`;
+    return `<div class="conflict-item"><div class="conflict-row"><span class="alert-tag">ALERT</span>${cs1} ↔ ${cs2}</div></div>`;
   }).join('');
+
+  const resolvedHtml = Array.from(resolvedSet.entries()).map(([key, v]) => {
+    const [cs1, cs2] = key.split('|');
+    const resLine = v.movedCs
+      ? `<div class="resolution-detail">↳ ${v.movedCs} → FL${String(Math.floor(v.newAlt/100)).padStart(3,'0')} (${Math.round(v.newAlt).toLocaleString()} ft)</div>`
+      : '';
+    return `<div class="conflict-item resolved-item"><div class="conflict-row"><span class="alert-tag resolved-tag">✓ OK</span>${cs1} ↔ ${cs2}</div>${resLine}</div>`;
+  }).join('');
+
+  list.innerHTML = activeHtml + resolvedHtml;
 }
 
 function markConflict(cs1, cs2) {
   const key = [cs1, cs2].sort().join('|');
+  resolvedSet.delete(key);
   conflictSet.add(key);
   renderConflictPanel();
-  setTimeout(() => { conflictSet.delete(key); renderConflictPanel(); }, 12000);
+  setTimeout(() => { conflictSet.delete(key); renderConflictPanel(); }, 15000);
+}
+
+function markResolved(cs1, cs2, movedCs, newAlt) {
+  const key = [cs1, cs2].sort().join('|');
+  conflictSet.delete(key);
+  resolvedSet.set(key, { ts: Date.now(), movedCs: movedCs || '', newAlt: newAlt || 0 });
+  renderConflictPanel();
 }
 
 function logATCEvent(message) {
@@ -2045,10 +2385,12 @@ function logATCEvent(message) {
 
 const _baseGetVisible = getVisibleAircraft;
 getVisibleAircraft = function() {
+  if (_cachedVisible !== null) return _cachedVisible;
   const sim = _baseGetVisible();
   const live = Array.from(liveAircraftMap.values());
   const liveCallsigns = new Set(live.map(a => a.callsign));
-  return [...sim.filter(a => !liveCallsigns.has(a.callsign)), ...live];
+  _cachedVisible = [...sim.filter(a => !liveCallsigns.has(a.callsign)), ...live];
+  return _cachedVisible;
 };
 
 function _isInConflict(callsign) {
@@ -2060,34 +2402,37 @@ function _isInConflict(callsign) {
 const _baseDrawAircraft = drawAircraft;
 drawAircraft = function(a) {
   const inConflict = _isInConflict(a.callsign);
-  if (inConflict) {
-    const savedStatus = a.status;
+
+  // Temporarily override status to 'emergency' so body draws red
+  if (inConflict && a.status !== 'emergency') {
+    const saved = a.status;
     a.status = 'emergency';
     _baseDrawAircraft(a);
-    a.status = savedStatus;
+    a.status = saved;
   } else {
     _baseDrawAircraft(a);
   }
+
+  // Compute projection once for overlay rings
   const p = project(a.lon, a.lat);
   if (!p) return;
+  if (state.level === 0 && p[2] !== undefined && p[2] < 0.1) return;
+
   if (a.isLive) {
     ctx.save();
     ctx.strokeStyle = '#00e5ff';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([3, 2]);
-    ctx.beginPath();
-    ctx.arc(p[0], p[1], 11, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(p[0], p[1], 11, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
   }
-  if (_isInConflict(a.callsign)) {
+
+  if (inConflict) {
     ctx.save();
     ctx.strokeStyle = '#ff1744';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(p[0], p[1], 14, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(p[0], p[1], 15, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   }
 };

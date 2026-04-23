@@ -3,14 +3,13 @@ package com.watchyojet.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.watchyojet.WYJAppController;
 import com.watchyojet.model.Aircraft;
 import com.watchyojet.model.Conflict;
 
 public class ConflictDetector {
 
-    private static final double MIN_DISTANCE = 5.0; // nautical miles
-    private static final double MAX_LOOKAHEAD_SECONDS = 300.0; // 5 minutes
+    private static final double MIN_DISTANCE = 3.0; // nautical miles (standard TRACON)
+    private static final double MAX_LOOKAHEAD_SECONDS = 120.0; // 2 minutes
 
     public List<Conflict> detectConflicts(List<Aircraft> aircrafts) {
 
@@ -45,12 +44,6 @@ public class ConflictDetector {
                     System.out.println("→ Altitude diff: " + String.format("%.0f", altitudeDiff) + " ft");
                     System.out.println("→ Severity: " + severity);
 
-                    if (WYJAppController.getInstance() != null) {
-                        WYJAppController.getInstance().log(
-                                "Conflict predicted between "
-                                        + a1.getCallsign() + " and " + a2.getCallsign()
-                        );
-                    }
                 }
             }
         }
