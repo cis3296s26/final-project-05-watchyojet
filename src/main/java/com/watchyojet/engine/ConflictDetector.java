@@ -8,8 +8,11 @@ import com.watchyojet.model.Conflict;
 
 public class ConflictDetector {
 
-    private static final double MIN_DISTANCE = 3.0;          // nautical miles (TRACON standard)
-    private static final double MAX_LOOKAHEAD_SECONDS = 120.0; // 2 minutes
+    private static final double MIN_DISTANCE = 1.0;
+    private static final double MAX_LOOKAHEAD_SECONDS = 300.0;
+
+    // Toggle for demo
+    private static final boolean DEMO_MODE = true;
 
     public List<Conflict> detectConflicts(List<Aircraft> aircrafts) {
 
@@ -24,25 +27,30 @@ public class ConflictDetector {
                 double altitudeDiff = Math.abs(
                         Math.round(a1.getAltitude()) - Math.round(a2.getAltitude()));
 
-                // Compute tCPA once and reuse — avoids 3× redundant calls per pair.
                 double tCPA = timeToCPA(a1, a2);
 
                 if (tCPA <= 0 || tCPA >= MAX_LOOKAHEAD_SECONDS) continue;
 
                 double cpaDistance = distanceAtCPA(a1, a2, tCPA);
 
-                if (cpaDistance < MIN_DISTANCE && altitudeDiff < 1000) {
+                // Disabled in demo mode
+                if (!DEMO_MODE && cpaDistance < MIN_DISTANCE && altitudeDiff < 1000) {
 
-                    conflicts.add(new Conflict(a1, a2));
+                    String sevStr = classifySeverity(cpaDistance, altitudeDiff);
+                    Conflict.Severity severity = switch (sevStr) {
+                        case "CRITICAL" -> Conflict.Severity.CRITICAL;
+                        case "HIGH"     -> Conflict.Severity.HIGH;
+                        default         -> Conflict.Severity.MEDIUM;
+                    };
 
-                    String severity = classifySeverity(cpaDistance, altitudeDiff);
+                    conflicts.add(new Conflict(a1, a2, severity, tCPA, cpaDistance));
 
                     System.out.println("\n[CONFLICT DETECTED]");
                     System.out.println(a1.getCallsign() + " ↔ " + a2.getCallsign());
                     System.out.println("→ tCPA: " + String.format("%.0f", tCPA) + " sec");
                     System.out.println("→ dCPA: " + String.format("%.2f", cpaDistance) + " NM");
                     System.out.println("→ Altitude diff: " + String.format("%.0f", altitudeDiff) + " ft");
-                    System.out.println("→ Severity: " + severity);
+                    System.out.println("→ Severity: " + sevStr);
                 }
             }
         }
@@ -50,20 +58,16 @@ public class ConflictDetector {
         return conflicts;
     }
 
-    // ── CPA CALCULATIONS ────────────────────────────────────────────────────
-
     private double timeToCPA(Aircraft a1, Aircraft a2) {
 
         double avgLat = (a1.getLat() + a2.getLat()) / 2.0;
         double cosLat = Math.cos(Math.toRadians(avgLat));
 
-        // Positions in NM using equirectangular projection
         double x1 = a1.getLon() * 60.0 * cosLat;
         double y1 = a1.getLat() * 60.0;
         double x2 = a2.getLon() * 60.0 * cosLat;
         double y2 = a2.getLat() * 60.0;
 
-        // Velocities in NM/hr (knots)
         double vx1 = a1.getSpeed() * Math.sin(Math.toRadians(a1.getHeading()));
         double vy1 = a1.getSpeed() * Math.cos(Math.toRadians(a1.getHeading()));
         double vx2 = a2.getSpeed() * Math.sin(Math.toRadians(a2.getHeading()));
@@ -75,14 +79,12 @@ public class ConflictDetector {
         double dy  = y2 - y1;
 
         double dv2 = dvx * dvx + dvy * dvy;
-        // Parallel tracks — no convergence, no conflict via CPA
         if (dv2 == 0) return -1;
 
         double tHours = -(dx * dvx + dy * dvy) / dv2;
-        return tHours * 3600.0; // → seconds
+        return tHours * 3600.0;
     }
 
-    // Accept pre-computed tCPA to avoid redundant recalculation.
     private double distanceAtCPA(Aircraft a1, Aircraft a2, double tCPA) {
 
         double[] p1 = TrajectoryPredictor.predictPosition(a1, tCPA);
@@ -99,8 +101,8 @@ public class ConflictDetector {
     }
 
     private String classifySeverity(double distance, double altDiff) {
-        if (distance < 1.0 && altDiff < 500) return "CRITICAL";
-        else if (distance < 3.0)             return "HIGH";
-        else                                  return "MEDIUM";
+        if (distance < 1.0 && altDiff < 300) return "CRITICAL";
+        else if (distance < 2.0)             return "HIGH";
+        else                                 return "MEDIUM";
     }
 }

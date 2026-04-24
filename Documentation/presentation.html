@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WatchyoJet — Final Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:         #f4f1ec;
+    --bg-panel:   #ffffff;
+    --bg-soft:    #ebe6de;
+    --ink:        #1a1d24;
+    --ink-soft:   #5a6370;
+    --ink-faint:  #99a0ab;
+    --line:       #d9d3c8;
+    --accent:     #ff5a1f;
+    --accent-deep:#d94412;
+    --ok:         #2e8b57;
+    --warn:       #e0a800;
+    --danger:     #c8302c;
+    --mono:       'JetBrains Mono', monospace;
+    --serif:      'Fraunces', serif;
+    --sans:       'Outfit', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #1a1d24;
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SLIDE DECK ── */
+  #deck {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    background: var(--bg);
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* layout helpers */
+  .slide.dark { background: var(--ink); color: #f4f1ec; }
+  .slide.accent-bg { background: var(--accent); color: #fff; }
+  .slide.left { align-items: flex-start; }
+  .slide.top  { justify-content: flex-start; padding-top: 72px; }
+
+  /* ── TYPOGRAPHY ── */
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    opacity: 0.9;
+  }
+  .slide.dark .label { color: #ff8c5a; }
+  .slide.accent-bg .label { color: rgba(255,255,255,0.75); }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .slide.dark h1 { color: #f4f1ec; }
+  .slide.accent-bg h1 { color: #fff; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+  .slide.dark h2 { color: #f4f1ec; }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .slide.dark h3 { color: #f4f1ec; }
+
+  p, li {
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    max-width: 780px;
+  }
+  .slide.dark p, .slide.dark li { color: #b8bfc8; }
+
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+
+  .subtitle {
+    font-size: 22px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    font-weight: 300;
+  }
+  .slide.dark .subtitle { color: #8a9099; }
+
+  /* ── COMPONENTS ── */
+  .pill {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 3px;
+  }
+  .pill-accent  { background: var(--accent);  color: #fff; }
+  .pill-ok      { background: #d4edde; color: var(--ok); }
+  .pill-warn    { background: #fff3cd; color: #856404; }
+  .pill-danger  { background: #fde8e8; color: var(--danger); }
+  .pill-mono    { background: var(--bg-soft); color: var(--ink-soft); }
+
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 16px -4px rgba(20,25,35,0.10);
+  }
+  .slide.dark .card {
+    background: #252830;
+    border-color: #333840;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 1000px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; }
+
+  .accent-line {
+    width: 56px; height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+  .slide.accent-bg .accent-line { background: rgba(255,255,255,0.5); }
+
+  .big-stat {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .big-stat-label {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  .code-block {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: #1a1d24;
+    color: #d4d8e0;
+    padding: 18px 22px;
+    border-radius: 8px;
+    line-height: 1.7;
+    width: 100%;
+  }
+  .code-block .kw  { color: #ff8c5a; }
+  .code-block .cm  { color: #5a6370; }
+  .code-block .st  { color: #7ecf8a; }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .flow-node {
+    background: var(--bg-panel);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    min-width: 110px;
+  }
+  .flow-arrow {
+    width: 32px;
+    height: 2px;
+    background: var(--line);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: -4px;
+    border: 5px solid transparent;
+    border-left-color: var(--line);
+  }
+  .flow-node.highlight { border-color: var(--accent); color: var(--accent); }
+
+  .team-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-align: center;
+  }
+  .team-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: 2px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 auto 12px;
+  }
+  .team-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+  .team-role { font-size: 13px; color: var(--ink-faint); font-family: var(--mono); }
+
+  /* ── LOGO ── */
+  .logo-aircraft {
+    display: inline-block;
+    margin-right: 10px;
+    flex-shrink: 0;
+    line-height: 0;
+  }
+  .logo-text {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+  .logo-text span { color: var(--accent); font-style: italic; }
+
+  /* ── NAV ── */
+  #nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    background: rgba(26,29,36,0.85);
+    border-radius: 40px;
+    padding: 10px 20px;
+    backdrop-filter: blur(8px);
+  }
+  #nav button {
+    background: none;
+    border: 1.5px solid #3a3f4a;
+    color: #8a9099;
+    border-radius: 50%;
+    width: 34px; height: 34px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  #nav button:hover { border-color: var(--accent); color: var(--accent); }
+  #slide-counter {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #5a6370;
+    min-width: 56px;
+    text-align: center;
+  }
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+    z-index: 200;
+  }
+
+  /* ── CHALLENGE CARD ── */
+  .challenge {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--danger);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .challenge h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+  .challenge p  { font-size: 14px; line-height: 1.55; color: var(--ink-soft); max-width: none; }
+  .challenge .fix { color: var(--ok); font-weight: 600; }
+
+  /* placeholder hint */
+  .todo {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px dashed #e0a800;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 13px;
+    font-family: var(--mono);
+    margin: 2px 0;
+  }
+
+  @media print { #nav, #progress-bar { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div id="deck">
+
+  <!-- ═══════════════════════════════════ SLIDE 1 — TITLE -->
+  <div class="slide active" style="text-align:center; background: #1a1d24;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;">
+      <span class="logo-aircraft"><svg width="18" height="26" viewBox="0 0 18 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 0C7.8 0 7 2 7 5L7 17C7 20.5 7.8 24 9 28C10.2 24 11 20.5 11 17L11 5C11 2 10.2 0 9 0Z" fill="#ff5a1f"/><path d="M7 8L0 16L0 18L7 15Z" fill="#ff5a1f"/><path d="M11 8L18 16L18 18L11 15Z" fill="#ff5a1f"/><path d="M7 21L3 27L5 27L9 24.5L13 27L15 27L11 21Z" fill="#ff5a1f"/></svg></span>
+      <span class="logo-text" style="color:#f4f1ec;">Watchy<span>o</span>Jet</span>
+    </div>
+    <h1 style="color:#f4f1ec; font-size:56px; max-width:760px; margin:0 auto;">Autonomous Air Traffic Control Decision System</h1>
+    <p style="color:#5a6370; margin-top:20px; font-size:16px; font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;">
+      CIS 3296 — Software Design &nbsp;·&nbsp; Final Presentation &nbsp;·&nbsp; December 5, 2025<br/>
+      <span style="color:#3a3f4a;">Hamza Malik &nbsp;·&nbsp; Brandon &nbsp;·&nbsp; Mateusz &nbsp;·&nbsp; Dylan</span>
+    </p>
+    <div style="margin-top:48px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <span class="pill pill-accent">Shadow Mode ATC</span>
+      <span class="pill" style="background:#252830;color:#8a9099;">Live OpenSky Data</span>
+      <span class="pill" style="background:#252830;color:#8a9099;">PHL TRACON Airspace</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 2 — TEAM -->
+  <div class="slide top left">
+    <div class="label">Section 1 — Introduction</div>
+    <div class="accent-line"></div>
+    <h2>The Team</h2>
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; width:100%; max-width:960px; margin-top:8px;">
+      <div class="team-card">
+        <div class="team-avatar">H</div>
+        <div class="team-name">Hamza Malik</div>
+        <div class="team-role">System Architecture, Frontend, Backend</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">B</div>
+        <div class="team-name">Brandon</div>
+        <div class="team-role">Live Data &amp; API</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">M</div>
+        <div class="team-name">Mateusz</div>
+        <div class="team-role">Map &amp; Trajectory</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">D</div>
+        <div class="team-name">Dylan</div>
+        <div class="team-role">APIs &amp; Project Mgmt</div>
+      </div>
+    </div>
+    <p style="margin-top:28px; font-size:15px; color:var(--ink-faint);">
+      Group name: <strong style="color:var(--ink);">WatchyoJet</strong> &nbsp;·&nbsp; Temple University CIS
+    </p>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 3 — WHAT IS IT -->
+  <div class="slide top left">
+    <div class="label">Section 1 — Introduction</div>
+    <div class="accent-line"></div>
+    <h2>What is WatchyoJet?</h2>
+    <p style="font-size:20px; color:var(--ink); max-width:820px; line-height:1.7; margin-bottom:28px;">
+      An autonomous ATC decision system that monitors real-world flight data, detects aircraft on converging paths, and automatically issues altitude separation instructions with no human input required.
+    </p>
+    <div class="grid3" style="max-width:860px;">
+      <div class="card" style="text-align:center;">
+        <div class="big-stat">250+</div>
+        <div class="big-stat-label">live flights tracked</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-stat">2s</div>
+        <div class="big-stat-label">resolution cycle time</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-stat">120s</div>
+        <div class="big-stat-label">conflict lookahead window</div>
+      </div>
+    </div>
+    <p style="margin-top:24px; font-size:15px; color:var(--ink-faint); font-family:var(--mono);">
+      Airspace covered: PHL TRACON (~60 NM radius around Philadelphia International)
+    </p>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 4 — THE PROBLEM -->
+  <div class="slide top left">
+    <div class="label">Section 1 — The Problem</div>
+    <div class="accent-line"></div>
+    <h2>What problem does it solve?</h2>
+    <div class="grid2" style="max-width:960px;">
+      <div>
+        <h3 style="margin-bottom:12px;">Today's ATC</h3>
+        <ul style="font-size:17px; line-height:1.8;">
+          <li>100% reliant on human controllers</li>
+          <li>Controllers manage 10–20 aircraft at once, under constant pressure</li>
+          <li>Human fatigue leads to real incidents like runway incursions and near-misses</li>
+          <li>Separation decisions happen reactively, not predictively</li>
+          <li>No system-wide awareness of all converging pairs simultaneously</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:12px;">WatchyoJet</h3>
+        <ul style="font-size:17px; line-height:1.8;">
+          <li>Tracks every aircraft in the airspace simultaneously</li>
+          <li>Uses CPA math to detect conflicts 2 minutes ahead</li>
+          <li>Resolves every conflict in under 2 seconds</li>
+          <li>Never fatigued, never distracted</li>
+          <li>Every decision is logged with callsigns and altitudes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 5 — COMPETITORS -->
+  <div class="slide top left">
+    <div class="label">Section 1 — Competitor Analysis</div>
+    <div class="accent-line"></div>
+    <h2>Existing Products</h2>
+    <div class="grid2" style="max-width:960px;">
+      <div class="card">
+        <h3>Leidos STARS</h3>
+        <p style="font-size:15px; margin-top:6px;">The FAA's actual Standard Terminal Automation Replacement System. Full radar integration, certified for operational use. Costs tens of millions to deploy.</p>
+      </div>
+      <div class="card">
+        <h3>Eurocontrol SESAR</h3>
+        <p style="font-size:15px; margin-top:6px;">European ATC modernisation initiative. Consortium of 60+ organisations. Focuses on pan-European airspace management at a continental scale.</p>
+      </div>
+      <div class="card">
+        <h3>FlightAware / Flightradar24</h3>
+        <p style="font-size:15px; margin-top:6px;">Flight tracking and situational awareness tools. Show where planes are but make no decisions — purely informational.</p>
+      </div>
+      <div class="card">
+        <h3>Saab Sensis ATC Systems</h3>
+        <p style="font-size:15px; margin-top:6px;">Enterprise ATC surveillance and automation. Used at major international airports. Proprietary, extremely expensive, requires hardware integration.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 6 — HOW WE DIFFER -->
+  <div class="slide dark top left">
+    <div class="label">Section 1 — Differentiation</div>
+    <div class="accent-line"></div>
+    <h2>How WatchyoJet is different</h2>
+    <div class="grid2" style="max-width:900px;">
+      <div>
+        <ul style="font-size:17px; line-height:1.9; list-style:none; padding:0;">
+          <li>✦ &nbsp;<strong style="color:#f4f1ec;">Shadow mode:</strong> runs alongside real operations with no radio access needed</li>
+          <li>✦ &nbsp;<strong style="color:#f4f1ec;">Open data:</strong> uses the free OpenSky Network API with zero licensing cost</li>
+          <li>✦ &nbsp;<strong style="color:#f4f1ec;">Predictive:</strong> catches conflicts before they happen using CPA trajectory math</li>
+          <li>✦ &nbsp;<strong style="color:#f4f1ec;">Transparent:</strong> every decision is logged with callsigns, altitudes, and timestamps</li>
+          <li>✦ &nbsp;<strong style="color:#f4f1ec;">Category-aware:</strong> emergency aircraft are never moved and military gets priority</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card" style="background:#252830;border-color:#333840;">
+          <p style="font-size:14px;font-family:var(--mono);color:#8a9099;">STARS / SESAR</p>
+          <p style="font-size:15px;margin-top:4px;">Certified operational systems requiring radar hardware, millions in infrastructure, and FAA/EASA certification</p>
+        </div>
+        <div class="card" style="background:#252830;border-color:var(--accent);">
+          <p style="font-size:14px;font-family:var(--mono);color:var(--accent);">WatchyoJet</p>
+          <p style="font-size:15px;margin-top:4px;">Runs on a laptop. Uses public ADS-B data. Shows what autonomous ATC can look like and actually makes decisions in real time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 7 — DEMO -->
+  <div class="slide accent-bg" style="text-align:center;">
+    <div class="label" style="font-size:13px;">Section 2</div>
+    <div class="accent-line" style="margin:16px auto 24px;"></div>
+    <h1 style="font-size:80px; color:#fff;">Live Demo</h1>
+    <div style="margin-top:40px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+      <span class="pill" style="background:rgba(0,0,0,0.2);color:#fff;font-size:13px;">Live aircraft positions</span>
+      <span class="pill" style="background:rgba(0,0,0,0.2);color:#fff;font-size:13px;">Conflict detection</span>
+      <span class="pill" style="background:rgba(0,0,0,0.2);color:#fff;font-size:13px;">Auto resolution</span>
+      <span class="pill" style="background:rgba(0,0,0,0.2);color:#fff;font-size:13px;">Resolution history log</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 8 — RESPONSIBILITIES -->
+  <div class="slide top left" style="padding: 36px 60px;">
+    <div class="label">Section 3 — Project Responsibilities</div>
+    <div class="accent-line" style="margin-bottom:16px;"></div>
+    <h2 style="margin-bottom:16px;">Who did what</h2>
+    <div class="grid2" style="max-width:960px; gap:14px;">
+      <div class="card" style="padding:16px 20px;">
+        <h3 style="margin-bottom:6px;">Hamza Malik</h3>
+        <ul style="font-size:13px; margin-top:6px; line-height:1.65;">
+          <li>Designed system architecture and simulation loop</li>
+<li>Implemented conflict detection using CPA math</li>
+<li>Built resolution and ATC engine with prioritization and cooldown logic</li>
+<li>Contributed to frontend UI including resolution log</li>
+         
+        </ul>
+      </div>
+      <div class="card" style="padding:16px 20px;">
+        <h3 style="margin-bottom:6px;">Brandon</h3>
+        <ul style="font-size:13px; margin-top:6px; line-height:1.65;">
+          <li>Implemented HTTPClient API to fetch OpenSky data</li>
+          <li>Integrated live flight state data into the system</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:16px 20px;">
+        <h3 style="margin-bottom:6px;">Mateusz</h3>
+        <ul style="font-size:13px; margin-top:6px; line-height:1.65;">
+          <li>Created initial map interface using Leaflet</li>
+<li>Implemented trajectory predictor logic</li>
+<li>Interpolated airplane movement on the map</li>
+<li>Visualized flight paths</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:16px 20px;">
+        <h3 style="margin-bottom:6px;">Dylan</h3>
+        <ul style="font-size:13px; margin-top:6px; line-height:1.65;">
+          <li>Implemented initial REST endpoint APIs</li>
+<li>Updated weekly project board and reports</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 9 — TECH STACK -->
+  <div class="slide top left">
+    <div class="label">Section 4 — Technical Implementation</div>
+    <div class="accent-line"></div>
+    <h2>Tech Stack</h2>
+    <div class="grid3" style="max-width:900px;">
+      <div class="card">
+        <p class="pill pill-accent" style="margin-bottom:12px; display:inline-block;">Language</p>
+        <h3>Java 17</h3>
+        <p style="font-size:14px; margin-top:6px;">Core backend, ATC engine, HTTP client, data models</p>
+      </div>
+      <div class="card">
+        <p class="pill pill-ok" style="margin-bottom:12px; display:inline-block;">UI Framework</p>
+        <h3>JavaFX 21</h3>
+        <p style="font-size:14px; margin-top:6px;">Application window, WebView for the map, JS bridge via executeScript()</p>
+      </div>
+      <div class="card">
+        <p class="pill pill-warn" style="margin-bottom:12px; display:inline-block;">Map</p>
+        <h3>Leaflet.js</h3>
+        <p style="font-size:14px; margin-top:6px;">Interactive map rendered inside JavaFX WebView, OpenStreetMap tiles</p>
+      </div>
+      <div class="card">
+        <p class="pill pill-mono" style="margin-bottom:12px; display:inline-block;">Data Source</p>
+        <h3>OpenSky Network</h3>
+        <p style="font-size:14px; margin-top:6px;">Free REST API for live ADS-B transponder data, no API key required</p>
+      </div>
+      <div class="card">
+        <p class="pill pill-mono" style="margin-bottom:12px; display:inline-block;">JSON</p>
+        <h3>Jackson</h3>
+        <p style="font-size:14px; margin-top:6px;">Parses OpenSky API response into state vectors</p>
+      </div>
+      <div class="card">
+        <p class="pill pill-mono" style="margin-bottom:12px; display:inline-block;">Build</p>
+        <h3>Maven</h3>
+        <p style="font-size:14px; margin-top:6px;">Dependency management, packaging, module system for JavaFX</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 10 — ARCHITECTURE -->
+  <div class="slide top left">
+    <div class="label">Section 4 — Architecture</div>
+    <div class="accent-line"></div>
+    <h2>How it all fits together</h2>
+    <div style="width:100%; max-width:920px;">
+      <div class="flow" style="margin-bottom:18px;">
+        <div class="flow-node highlight">OpenSky API<br><span style="font-size:10px;font-weight:400;color:var(--ink-faint);">every 12s</span></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">OpenSky<br>Fetcher</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">Aircraft<br>Manager</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node highlight">ATC Engine<br><span style="font-size:10px;font-weight:400;color:var(--ink-faint);">every 2s</span></div>
+      </div>
+      <div class="flow" style="margin-bottom:24px;">
+        <div class="flow-node">Movement<br>Engine</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">Conflict<br>Detector</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">Resolution<br>Engine</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node highlight">WYJApp<br>Controller</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">map.html<br><span style="font-size:10px;font-weight:400;color:var(--ink-faint);">Leaflet UI</span></div>
+      </div>
+      <div class="grid3" style="max-width:none;">
+        <div class="card" style="font-size:14px;">
+          <strong>AircraftManager</strong> preserves ATC-issued altitudes across API refreshes. Only position, speed, and heading get updated from live data.
+        </div>
+        <div class="card" style="font-size:14px;">
+          <strong>ConflictDetector</strong> uses CPA math (tCPA + dCPA) to find pairs that will violate 3 NM / 1000 ft separation within 2 minutes.
+        </div>
+        <div class="card" style="font-size:14px;">
+          <strong>ResolutionEngine</strong> searches ±1000 ft increments for a free altitude, bounded by flight phase and aircraft performance limits.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 11 — CHALLENGES 1 -->
+  <div class="slide dark top left">
+    <div class="label">Section 5 — Challenges &amp; Solutions</div>
+    <div class="accent-line"></div>
+    <h2>Technical Challenges</h2>
+    <div style="max-width:900px; width:100%;">
+      <div class="challenge">
+        <h4>Resolutions were being overwritten by the live API</h4>
+        <p>Every 12s refresh replaced the full aircraft state from raw transponder data, silently undoing every altitude change the engine issued.</p>
+        <p class="fix">Fix: AircraftManager now only updates lat/lon/speed/heading. Altitude is preserved once an aircraft is being tracked.</p>
+      </div>
+      <div class="challenge">
+        <h4>CRUISE-phase aircraft were all UNRESOLVED (24/24 conflicts)</h4>
+        <p>The CRUISE search floor was set to FL180, but most cruise aircraft were between 10k–18k ft. This made searchFloor > searchCeiling — an empty search range. Every resolver call returned null.</p>
+        <p class="fix">Fix: CRUISE defaults to MIN_ALTITUDE (3,000 ft). Band lock then raises the floor only for aircraft already above FL180.</p>
+      </div>
+      <div class="challenge">
+        <h4>Dense airspace blocked every candidate altitude (9–16 UNRESOLVED)</h4>
+        <p>With PROXIMITY_NM = 15, the isAltitudeFree check covered 15–20 aircraft around each target. Each blocked a 1,000 ft slot, filling the entire searchable band.</p>
+        <p class="fix">Fix: Reduced to 8 NM which is realistic for actual separation checks. Dropped blocked slots to 3–6 per aircraft.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 12 — CHALLENGES 2 -->
+  <div class="slide dark top left">
+    <div class="label">Section 5 — Challenges &amp; Solutions</div>
+    <div class="accent-line"></div>
+    <h2>More Challenges</h2>
+    <div style="max-width:900px; width:100%;">
+      <div class="challenge">
+        <h4>Two aircraft assigned the same altitude in one cycle</h4>
+        <p>Without coordination, two separate conflict pairs could both resolve to FL210, creating a new collision in the process of fixing the original ones.</p>
+        <p class="fix">Fix: pendingAltitudes map tracks every committed altitude within a cycle. isAltitudeFree() checks it before approving a candidate.</p>
+      </div>
+      <div class="challenge">
+        <h4>JavaFX WebView JS bridge called before the page loaded</h4>
+        <p>The first implementation started the ATC loop immediately on launch. executeScript() calls were silently dropped. The map appeared but never updated.</p>
+        <p class="fix">Fix: Main loop now starts only after the WebView fires Worker.State.SUCCEEDED, confirming JS functions exist.</p>
+      </div>
+      <div class="challenge">
+        <h4>Non-technical: Scope creep and feature prioritisation</h4>
+        <p>The original plan included weather integration, runway scheduling, heading-change advisories, and multi-airport support. All underestimated.</p>
+        <p class="fix">Fix: Scoped to what could be proven correct — vertical separation over one airspace. Everything else became future work.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 13 — UNFINISHED -->
+  <div class="slide top left">
+    <div class="label">Section 6 — Unfinished Features</div>
+    <div class="accent-line"></div>
+    <h2>What we didn't ship</h2>
+    <div class="grid2" style="max-width:960px;">
+      <div>
+        <h3 style="margin-bottom:14px;">Planned but not built</h3>
+        <ul style="font-size:16px; line-height:1.85;">
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Horizontal resolution using heading and bearing changes</li>
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Weather integration (winds, visibility, icing)</li>
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Runway sequencing and landing queue</li>
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Multi-airport / en-route airspace support</li>
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Audio alerts and spoken ATC instructions</li>
+          <li><span class="pill pill-danger" style="font-size:11px;">Missing</span> &nbsp;Historical playback / replay mode</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:14px;">What shipped</h3>
+        <ul style="font-size:16px; line-height:1.85;">
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;Live data ingestion from OpenSky</li>
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;CPA-based conflict detection</li>
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;Vertical separation resolution</li>
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;Priority rules (emergency/military)</li>
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;Live map with conflict visualisation</li>
+          <li><span class="pill pill-ok" style="font-size:11px;">Done</span> &nbsp;Resolution history log</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 14 — FUTURE -->
+  <div class="slide top left">
+    <div class="label">Section 6 — Future Plans</div>
+    <div class="accent-line"></div>
+    <h2>If we had more time</h2>
+    <div class="grid2" style="max-width:960px;">
+      <div class="card">
+        <h3>Horizontal Resolution</h3>
+        <p style="font-size:15px; margin-top:8px;">Instead of only changing altitude, issue heading changes to move aircraft laterally away from each other. In real ATC, altitude changes are actually a last resort.</p>
+      </div>
+      <div class="card">
+        <h3>Weather Layer</h3>
+        <p style="font-size:15px; margin-top:8px;">Pull METAR/TAF data and factor wind, turbulence, and precipitation into routing. Currently all aircraft are treated as flying in calm conditions.</p>
+      </div>
+      <div class="card">
+        <h3>Runway Sequencing</h3>
+        <p style="font-size:15px; margin-top:8px;">Build a landing queue for PHL — sequence aircraft by arrival time, manage approach spacing, and assign runways automatically based on wind direction.</p>
+      </div>
+      <div class="card">
+        <h3>Voice Output</h3>
+        <p style="font-size:15px; margin-top:8px;">Generate synthesised ATC radio calls like "United 347, climb and maintain flight level two-four-zero" to simulate what a real controller would say.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 15 — REFLECTIONS -->
+  <div class="slide top left">
+    <div class="label">Section 7 — Personal Reflections</div>
+    <div class="accent-line"></div>
+    <h2>What we each took away</h2>
+    <div class="grid2" style="max-width:960px; gap:18px;">
+      <div class="card">
+        <h3>Hamza Malik</h3>
+        <p style="font-size:15px; margin-top:10px; line-height:1.7;">
+          The hardest part was debugging silent failures in the JS bridge. No error, no output, just nothing happening. Taught me to always verify the bridge is ready before calling into it. Most satisfying moment was fixing the CRUISE floor bug and watching 24 unresolved conflicts drop to near zero in one run.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Brandon</h3>
+        <p style="font-size:15px; margin-top:10px; line-height:1.7;">
+          I enjoyed seeing actual live flight data come through for the first time. That's when it started feeling real. The tricky part was how inconsistent the API was. Some aircraft had missing fields, wrong units, or blank callsigns. Learned pretty fast to never trust external data without validating everything.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Mateusz</h3>
+        <p style="font-size:15px; margin-top:10px; line-height:1.7;">
+          The map was the most satisfying part to build. Watching plane icons actually move on a real map felt great. Getting the movement to interpolate smoothly between API updates was harder than I expected though. Next time I'd start on the trajectory math earlier instead of pushing it to later in the sprint.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Dylan</h3>
+        <p style="font-size:15px; margin-top:10px; line-height:1.7;">
+          Managing the board taught me how fast scope grows when everyone has ideas. Keeping sprints realistic was harder than I thought it would be. Working in a team takes more coordination than going solo but we built something that none of us would have finished on our own in this timeframe.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 16 — PROJECT MGMT -->
+  <div class="slide top left">
+    <div class="label">Section 8 — Project Management</div>
+    <div class="accent-line"></div>
+    <h2>Scrum &amp; Teamwork</h2>
+    <div class="grid2" style="max-width:960px;">
+      <div>
+        <h3 style="margin-bottom:12px;">How we ran the project</h3>
+        <ul style="font-size:16px; line-height:1.85;">
+          <li>Weekly Scrum meetings — every Friday, in person</li>
+          <li>Features developed throughout the week, discussed at each meeting</li>
+          <li>Project board and sprint report updated every week</li>
+          <li>Quality check at each meeting: demo new functionality, decide if branch is ready to merge to main</li>
+          <li>Feature branches — PRs reviewed before any merge</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:12px;">Reflection on teamwork</h3>
+        <ul style="font-size:16px; line-height:1.85;">
+          <li>Having a fixed weekly meeting kept everyone accountable</li>
+          <li>The merge gate at meetings caught problems before they hit main</li>
+          <li>Scope was the hardest thing to agree on — everyone had more ideas than time</li>
+          <li>Working as a team meant we shipped something more complete than any one of us could have alone</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top:24px; max-width:960px; border-left: 4px solid var(--accent);">
+      <p style="font-size:15px;">The biggest non-technical lesson: scoping a project is harder than building it. We planned features for a production ATC system — and built a working prototype that proves the concept.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ SLIDE 17 — CLOSE -->
+  <div class="slide dark" style="text-align:center;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:40px;">
+      <span class="logo-aircraft"><svg width="18" height="26" viewBox="0 0 18 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 0C7.8 0 7 2 7 5L7 17C7 20.5 7.8 24 9 28C10.2 24 11 20.5 11 17L11 5C11 2 10.2 0 9 0Z" fill="#ff5a1f"/><path d="M7 8L0 16L0 18L7 15Z" fill="#ff5a1f"/><path d="M11 8L18 16L18 18L11 15Z" fill="#ff5a1f"/><path d="M7 21L3 27L5 27L9 24.5L13 27L15 27L11 21Z" fill="#ff5a1f"/></svg></span>
+      <span class="logo-text" style="color:#f4f1ec;">Watchy<span>o</span>Jet</span>
+    </div>
+    <h1 style="color:#f4f1ec; font-size:64px;">Thank you.</h1>
+    <p style="color:#5a6370; margin-top:16px; font-size:18px;">Questions?</p>
+    <div style="margin-top:48px; display:flex; gap:24px; justify-content:center; flex-wrap:wrap;">
+      <div style="text-align:left;">
+        <p style="font-family:var(--mono);font-size:11px;color:#3a3f4a;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Source</p>
+        <p style="font-size:14px;color:#8a9099;">github.com/cis3296s26/final-project-05-watchyojet</p>
+      </div>
+      <div style="text-align:left;">
+        <p style="font-family:var(--mono);font-size:11px;color:#3a3f4a;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Data</p>
+        <p style="font-size:14px;color:#8a9099;">opensky-network.org</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── NAV ── -->
+<div id="nav">
+  <button id="btn-prev" title="Previous (←)">&#8592;</button>
+  <span id="slide-counter">1 / 17</span>
+  <button id="btn-next" title="Next (→)">&#8594;</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const counter = document.getElementById('slide-counter');
+  const bar = document.getElementById('progress-bar');
+  let cur = 0;
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+  }
+
+  document.getElementById('btn-prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('btn-next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); go(cur - 1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End')  go(slides.length - 1);
+  });
+
+  go(0);
+</script>
+</body>
+</html>

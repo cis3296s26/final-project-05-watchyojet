@@ -474,6 +474,23 @@
     letter-spacing: 0.02em;
   }
 
+  /* ===== RESOLUTION LOG ===== */
+  .res-log-entry {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.06);
+    margin-bottom: 4px;
+    border-left: 2px solid var(--ok);
+    line-height: 1.45;
+  }
+  .res-log-entry .res-ts { color: var(--ink-faint); font-size: 9px; }
+  .res-log-entry .res-pair { color: var(--ink); font-weight: 600; }
+  .res-log-entry .res-action { color: var(--ok); }
+  .res-log-entry .res-age { float: right; color: var(--ink-faint); font-size: 9px; }
+  #resLogList { max-height: 220px; overflow-y: auto; }
+
   /* ===== FOOTER ===== */
   footer {
     grid-area: footer;
@@ -590,6 +607,10 @@
   <div class="panel-section" id="conflictPanelSection" style="display:none">
     <div class="panel-title" style="color:var(--danger)">ACTIVE CONFLICTS <span class="count" id="conflictCount">0</span></div>
     <div id="conflictList"></div>
+  </div>
+  <div class="panel-section" id="resLogSection" style="display:none">
+    <div class="panel-title" style="color:var(--ok)">RESOLUTION LOG <span class="count" id="resLogCount">0</span></div>
+    <div id="resLogList"></div>
   </div>
   <div class="panel-section">
     <div class="panel-title">SELECTED AIRCRAFT</div>
@@ -2279,6 +2300,52 @@ const liveAircraftMap = new Map();
 const conflictSet = new Set();   // active conflicts: "CS1|CS2"
 const resolvedSet = new Map();   // recently resolved: "CS1|CS2" → timestamp
 
+// Resolution history — rolling last 10, each shown for 30 s
+const resolutionHistory = [];
+const RES_HISTORY_MAX  = 10;
+const RES_HISTORY_TTL  = 30000; // ms
+
+function _fmtResAge(tsMs) {
+  const s = Math.floor((Date.now() - tsMs) / 1000);
+  return s < 60 ? s + 's ago' : Math.floor(s / 60) + 'm ago';
+}
+
+function renderResolutionHistory() {
+  const section = document.getElementById('resLogSection');
+  const list    = document.getElementById('resLogList');
+  const countEl = document.getElementById('resLogCount');
+  if (!section || !list || !countEl) return;
+
+  const now = Date.now();
+  // Prune expired entries (older than 30 s)
+  while (resolutionHistory.length > 0 && now - resolutionHistory[0].ts > RES_HISTORY_TTL) {
+    resolutionHistory.shift();
+  }
+
+  if (resolutionHistory.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  countEl.textContent = resolutionHistory.length;
+
+  list.innerHTML = [...resolutionHistory].reverse().map(e => {
+    const flStr = e.movedCs && e.newAlt
+      ? `<span class="res-action">${e.movedCs} → FL${String(Math.floor(e.newAlt / 100)).padStart(3, '0')} (${Math.round(e.newAlt).toLocaleString()} ft)</span>`
+      : '<span class="res-action">separation applied</span>';
+    const d = new Date(e.ts);
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    const ss = String(d.getSeconds()).padStart(2,'0');
+    return `<div class="res-log-entry">` +
+      `<span class="res-age">${_fmtResAge(e.ts)}</span>` +
+      `<span class="res-ts">${hh}:${mm}:${ss} </span>` +
+      `<span class="res-pair">${e.cs1} ↔ ${e.cs2}</span><br>` +
+      flStr +
+      `</div>`;
+  }).join('');
+}
+
+// Refresh resolution log ages every 2 s so countdowns stay current
+setInterval(renderResolutionHistory, 2000);
+
 // Pending buffer — Java writes here; RAF applies it at the next frame boundary
 let _pendingLiveArr = null;
 
@@ -2371,7 +2438,14 @@ function markConflict(cs1, cs2) {
 function markResolved(cs1, cs2, movedCs, newAlt) {
   const key = [cs1, cs2].sort().join('|');
   conflictSet.delete(key);
-  resolvedSet.set(key, { ts: Date.now(), movedCs: movedCs || '', newAlt: newAlt || 0 });
+  const ts = Date.now();
+  resolvedSet.set(key, { ts, movedCs: movedCs || '', newAlt: newAlt || 0 });
+
+  // Add to resolution history (cap at 10)
+  resolutionHistory.push({ ts, cs1, cs2, movedCs: movedCs || '', newAlt: +newAlt || 0 });
+  if (resolutionHistory.length > RES_HISTORY_MAX) resolutionHistory.shift();
+  renderResolutionHistory();
+
   renderConflictPanel();
 }
 

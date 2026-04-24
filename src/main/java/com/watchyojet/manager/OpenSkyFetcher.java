@@ -53,19 +53,17 @@ public class OpenSkyFetcher {
 
             for (JsonNode state : statesNode) {
 
-                // OpenSky state vector has 17 fields (indices 0–16).
                 if (state.size() < 11) continue;
 
-                // Fields required for safe operation — skip if any are null.
+                // skip if essential fields are null
                 if (state.get(1).isNull()  ||   // callsign
                     state.get(5).isNull()  ||   // longitude
                     state.get(6).isNull()  ||   // latitude
                     state.get(9).isNull()  ||   // velocity (m/s)
-                    state.get(10).isNull())      // true_track (heading)
+                    state.get(10).isNull())      // heading
                     continue;
 
-                // Altitude: prefer baro_altitude (field 13) — this is what ATC uses.
-                // Fall back to geo_altitude (field 7) only if baro is missing.
+                // prefer baro_altitude (field 13), fall back to geo_altitude (field 7)
                 double altMeters;
                 if (state.size() > 13 && !state.get(13).isNull()) {
                     altMeters = state.get(13).asDouble();
@@ -96,7 +94,6 @@ public class OpenSkyFetcher {
         return liveAircraft;
     }
 
-    // Infer aircraft type from observable performance to enable priority rules.
     private AircraftType inferType(double speedKnots, double altFeet) {
         if (speedKnots > 400 || altFeet > 25000) return AircraftType.A320;
         if (speedKnots > 200)                    return AircraftType.B737;

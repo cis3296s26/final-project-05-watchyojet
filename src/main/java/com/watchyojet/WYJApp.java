@@ -27,7 +27,6 @@ public class WYJApp extends Application {
         try { controller.handleThemeChange(); } catch (Exception ignored) {}
         controller.webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                // Start your Main.main thread ONLY now
                 new Thread(controller.spawnMainThread).start();
             }
         });

@@ -44,11 +44,9 @@ public class WYJAppController {
     @FXML
     public void initialize() {
         instance = this;
-        // Initialize WebEngine here
         webEngine = webView.getEngine();
 
-        // Load a webpage (can be local or remote)
-        URL url = getClass().getResource("/map.html"); // local HTML
+        URL url = getClass().getResource("/map.html");
         if (url != null) {
             webEngine.load(url.toExternalForm());
         } else {
@@ -66,7 +64,7 @@ public class WYJAppController {
     }
 
     public void log(String message) {
-        Platform.runLater(() -> {//keeps the UI update from running on the LOGIC thread
+        Platform.runLater(() -> {
             logList.getItems().add(message);
             logList.scrollTo(logList.getItems().size() - 1);
         });
@@ -133,7 +131,6 @@ public class WYJAppController {
         });
     }
 
-    // Single Platform.runLater per ATC cycle for all conflict/resolution updates
     public void batchNotify(List<String[]> conflictPairs, List<String[]> resolvedPairs) {
         if (conflictPairs.isEmpty()) return;
         Platform.runLater(() -> {
@@ -141,23 +138,28 @@ public class WYJAppController {
                 Object check = webEngine.executeScript("typeof markConflict !== 'undefined'");
                 if (!check.equals(true)) return;
 
-                // Mark active conflicts
                 for (String[] pair : conflictPairs) {
                     String s1 = pair[0].replace("'", "\\'");
                     String s2 = pair[1].replace("'", "\\'");
                     webEngine.executeScript(String.format("markConflict('%s','%s')", s1, s2));
                 }
 
-                // Mark resolved conflicts — pass moved aircraft + new altitude
                 if (!resolvedPairs.isEmpty()) {
                     for (String[] pair : resolvedPairs) {
-                        String s1 = pair[0].replace("'", "\\'");
-                        String s2 = pair[1].replace("'", "\\'");
+                        String s1      = pair[0].replace("'", "\\'");
+                        String s2      = pair[1].replace("'", "\\'");
                         String movedCs = pair.length > 2 ? pair[2].replace("'", "\\'") : "";
-                        String newAlt  = pair.length > 3 ? pair[3] : "0";
-                        webEngine.executeScript(String.format(
-                            "typeof markResolved !== 'undefined' && markResolved('%s','%s','%s',%s)",
-                            s1, s2, movedCs, newAlt));
+                        String val     = pair.length > 3 ? pair[3] : "0";
+                        if (val.startsWith("HDG:")) {
+                            String deg = val.substring(4);
+                            webEngine.executeScript(String.format(
+                                "typeof logATCEvent !== 'undefined' && logATCEvent('%s heading → %s°')",
+                                movedCs, deg));
+                        } else {
+                            webEngine.executeScript(String.format(
+                                "typeof markResolved !== 'undefined' && markResolved('%s','%s','%s',%s)",
+                                s1, s2, movedCs, val));
+                        }
                     }
                     String msg = "✓ " + resolvedPairs.size() + " conflict(s) resolved";
                     webEngine.executeScript(String.format(
