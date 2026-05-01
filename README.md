@@ -4,11 +4,11 @@
 
 > **Shadow mode** means the system makes decisions and logs them, but does not transmit commands to real aircraft.
 
-**How we started 
+**How we started** 
 ![WatchyoJet GUI](POC.jpg)
 
-**How we finished
-![WatchyoJet GUI NEW](NEW WatchyoJet.jpg)
+**How we finished**
+![WatchyoJet GUI NEW](NEW WatchyojetGUI.jpg)
 
 ---
 
