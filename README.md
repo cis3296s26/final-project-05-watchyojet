@@ -4,7 +4,11 @@
 
 > **Shadow mode** means the system makes decisions and logs them, but does not transmit commands to real aircraft.
 
+**How we started 
 ![WatchyoJet GUI](POC.jpg)
+
+**How we finished
+![WatchyoJet GUI NEW](NEW WatchyoJet.jpg)
 
 ---
 
@@ -70,6 +74,17 @@ mvn javafx:run
 Maven downloads all dependencies automatically on the first run (~100 MB). The application window opens within 10–15 seconds.
 
 > **Windows:** the command is identical — run it in Command Prompt or PowerShell.
+
+**For Windows Users
+1. Downloaded Apache Maven from wesbite
+2. Unzip file
+3. Create new folder in C: drive named Maven
+4. Go to System Properties -> Advanced
+5. Bottom right of screen click Environment Variables
+6. Under System variables, double-click Path
+7. Click new, and copy the path of maven/bin
+8. Press ok
+9. Open IDE, use "mvn javafx:run" to start the application
 
 ---
 
