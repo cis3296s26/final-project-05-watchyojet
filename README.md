@@ -8,7 +8,7 @@
 ![WatchyoJet GUI](POC.jpg)
 
 **How we finished**
-![WatchyoJet GUI NEW](NEW WatchyojetGUI.jpg)
+![NEW WatchyojetGUI](NEW_WatchyojetGUI.jpg)
 
 ---
 
