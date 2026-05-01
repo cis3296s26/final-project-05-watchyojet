@@ -8,11 +8,10 @@ import com.watchyojet.model.Conflict;
 
 public class ConflictDetector {
 
-    private static final double MIN_DISTANCE = 1.0;
-    private static final double MAX_LOOKAHEAD_SECONDS = 300.0;
+    private static final double MIN_DISTANCE = 5.0;
+    private static final double MAX_LOOKAHEAD_SECONDS = 600.0;
 
-    // Toggle for demo
-    private static final boolean DEMO_MODE = true;
+    private static final boolean DEMO_MODE = false;
 
     public List<Conflict> detectConflicts(List<Aircraft> aircrafts) {
 

@@ -47,7 +47,8 @@ public class ResolutionEngine {
     public List<Resolution> resolveCluster(List<Conflict> cluster,
                                            List<Aircraft> allAircraft,
                                            Map<String, double[]> committed,
-                                           Set<String> locked) {
+                                           Set<String> locked,
+                                           Set<String> hardPairs) {
 
         cluster.sort(java.util.Comparator.comparing(Conflict::getSeverity)
                                          .thenComparingDouble(Conflict::getTCPA));
@@ -55,22 +56,26 @@ public class ResolutionEngine {
         List<Resolution> results = new ArrayList<>();
 
         for (Conflict c : cluster) {
-            // escalate resolution aggressiveness for genuinely critical pairs
-            double altDiffNow = Math.abs(getEffectiveAlt(c.getA1(), committed)
-                                       - getEffectiveAlt(c.getA2(), committed));
-            boolean critical  = c.getDCPA() < CRITICAL_DCPA && altDiffNow < CRITICAL_ALT_DIFF;
-
             Aircraft preferred = selectAircraftToMove(c);
             Aircraft other     = (preferred == c.getA1()) ? c.getA2() : c.getA1();
 
             Resolution r = null;
 
-            if (!locked.contains(preferred.getCallsign())) {
-                r = resolveOne(preferred, other, allAircraft, committed, critical);
-            }
-            // if the preferred aircraft is locked or resolution failed, try the other one
-            if (r == null && !locked.contains(other.getCallsign())) {
-                r = resolveOne(other, preferred, allAircraft, committed, critical);
+            if (hardPairs.contains(conflictKey(c))) {
+                // bypass cooldown — force separation on whichever aircraft can move
+                r = resolveHard(preferred, other, committed);
+                if (r == null) r = resolveHard(other, preferred, committed);
+            } else {
+                double altDiffNow = Math.abs(getEffectiveAlt(c.getA1(), committed)
+                                           - getEffectiveAlt(c.getA2(), committed));
+                boolean critical  = c.getDCPA() < CRITICAL_DCPA && altDiffNow < CRITICAL_ALT_DIFF;
+
+                if (!locked.contains(preferred.getCallsign())) {
+                    r = resolveOne(preferred, other, allAircraft, committed, critical);
+                }
+                if (r == null && !locked.contains(other.getCallsign())) {
+                    r = resolveOne(other, preferred, allAircraft, committed, critical);
+                }
             }
 
             if (r != null) {
@@ -81,6 +86,48 @@ public class ResolutionEngine {
         }
 
         return results;
+    }
+
+    // ── Hard (escalated) resolution ───────────────────────────────────────────
+
+    private Resolution resolveHard(Aircraft moving, Aircraft conflicting,
+                                   Map<String, double[]> committed) {
+        double conflictAlt = getEffectiveAlt(conflicting, committed);
+        double maxAlt      = moving.getType().getMaxAltitude();
+
+        // Try +1000 ft above the conflicting aircraft
+        double upAlt = snapToFL(conflictAlt + ALTITUDE_BUFFER);
+        if (Math.abs(upAlt - conflictAlt) >= ALTITUDE_BUFFER
+                && upAlt <= maxAlt && upAlt >= MIN_ALTITUDE) {
+            System.out.println("[HARD-ALT] " + moving.getCallsign()
+                    + " → " + (int) upAlt + " ft (forced vertical)");
+            return new Resolution(moving, upAlt);
+        }
+
+        // Try -1000 ft below the conflicting aircraft
+        double downAlt = snapToFL(conflictAlt - ALTITUDE_BUFFER);
+        if (Math.abs(downAlt - conflictAlt) >= ALTITUDE_BUFFER && downAlt >= MIN_ALTITUDE) {
+            System.out.println("[HARD-ALT] " + moving.getCallsign()
+                    + " → " + (int) downAlt + " ft (forced vertical)");
+            return new Resolution(moving, downAlt);
+        }
+
+        // Fallback: heading divergence >20° — pick the direction with better separation
+        double currentHdg = getEffectiveHdg(moving, committed);
+        double hdgRight    = (currentHdg + 25 + 360) % 360;
+        double hdgLeft     = (currentHdg - 25 + 360) % 360;
+        double sepRight    = cpaSepWithHdg(moving, hdgRight, conflicting, committed);
+        double sepLeft     = cpaSepWithHdg(moving, hdgLeft,  conflicting, committed);
+        double bestHdg     = sepRight >= sepLeft ? hdgRight : hdgLeft;
+        System.out.println("[HARD-HDG] " + moving.getCallsign()
+                + " → hdg " + (int) bestHdg + "° (forced divergence)");
+        return Resolution.forHeading(moving, bestHdg);
+    }
+
+    private static String conflictKey(Conflict c) {
+        String cs1 = c.getA1().getCallsign();
+        String cs2 = c.getA2().getCallsign();
+        return cs1.compareTo(cs2) < 0 ? cs1 + ":" + cs2 : cs2 + ":" + cs1;
     }
 
     // ── Per-aircraft resolution: altitude → heading → speed ───────────────────

@@ -25,8 +25,12 @@ public class ATCEngine {
     private final MovementEngine    movement;
 
     // cooldown prevents re-resolving the same aircraft every cycle
-    private final Map<String, Long> resolutionCooldown = new ConcurrentHashMap<>();
-    private static final long COOLDOWN_MS = 15_000;
+    private final Map<String, Long>    resolutionCooldown  = new ConcurrentHashMap<>();
+    private static final long          COOLDOWN_MS         = 15_000;
+
+    // escalation: if a conflict pair persists > ESCALATE_CYCLES, force hard resolution
+    private final Map<String, Integer> conflictPersistence = new ConcurrentHashMap<>();
+    private static final int           ESCALATE_CYCLES     = 2;
 
     public ATCEngine() {
         this.detector = new ConflictDetector();
@@ -41,8 +45,24 @@ public class ATCEngine {
         List<Conflict> conflicts = detector.detectConflicts(aircrafts);
 
         if (conflicts.isEmpty()) {
+            conflictPersistence.clear();
             updateMap(aircrafts);
             return;
+        }
+
+        // ── Persistence tracking ──────────────────────────────────────────────
+        Set<String> activeKeys = new HashSet<>();
+        for (Conflict c : conflicts) activeKeys.add(conflictKey(c));
+        conflictPersistence.keySet().retainAll(activeKeys);
+        for (String key : activeKeys) conflictPersistence.merge(key, 1, Integer::sum);
+
+        Set<String> hardPairs = new HashSet<>();
+        for (Map.Entry<String, Integer> e : conflictPersistence.entrySet()) {
+            if (e.getValue() > ESCALATE_CYCLES) hardPairs.add(e.getKey());
+        }
+        if (!hardPairs.isEmpty()) {
+            System.out.println("[ESCALATE] " + hardPairs.size()
+                    + " conflict pair(s) persisted >" + ESCALATE_CYCLES + " cycles → hard resolution");
         }
 
         // global sort: CRITICAL first, then earliest tCPA
@@ -69,7 +89,7 @@ public class ATCEngine {
         for (List<Conflict> cluster : detectClusters(conflicts)) {
 
             List<Resolution> clusterResolutions =
-                resolver.resolveCluster(cluster, aircrafts, committed, locked);
+                resolver.resolveCluster(cluster, aircrafts, committed, locked, hardPairs);
 
             for (Resolution r : clusterResolutions) {
                 String cs = r.getAircraft().getCallsign();
@@ -148,6 +168,14 @@ public class ATCEngine {
 
         notifyConflicts(conflicts, resolvedPairs);
         updateMap(aircrafts);
+    }
+
+    // ── Conflict key ─────────────────────────────────────────────────────────
+
+    private static String conflictKey(Conflict c) {
+        String cs1 = c.getA1().getCallsign();
+        String cs2 = c.getA2().getCallsign();
+        return cs1.compareTo(cs2) < 0 ? cs1 + ":" + cs2 : cs2 + ":" + cs1;
     }
 
     // ── BFS cluster detection ─────────────────────────────────────────────────

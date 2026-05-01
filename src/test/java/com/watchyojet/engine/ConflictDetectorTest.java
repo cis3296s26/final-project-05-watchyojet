@@ -15,9 +15,9 @@ public class ConflictDetectorTest {
 
     @Test
     void shouldDetectConflictWhenCloseAndSameAltitude() {
-
-        Aircraft a1 = new Aircraft("A1", 0, 0, 30000, 800, 0, AircraftType.A320);
-        Aircraft a2 = new Aircraft("A2", 1, 1, 30000, 800, 0, AircraftType.A320);
+        // head-on convergence ~12 NM apart, tCPA ≈ 43 s
+        Aircraft a1 = new Aircraft("A1", 40.0, -75.0, 30000, 500, 180, AircraftType.A320);
+        Aircraft a2 = new Aircraft("A2", 39.8, -75.0, 30000, 500,   0, AircraftType.A320);
 
         List<Aircraft> aircrafts = Arrays.asList(a1, a2);
 
@@ -29,9 +29,9 @@ public class ConflictDetectorTest {
 
     @Test
     void shouldNotDetectConflictWhenFarApart() {
-
-        Aircraft a1 = new Aircraft("A1", 0, 0, 30000, 800, 0, AircraftType.A320);
-        Aircraft a2 = new Aircraft("A2", 100, 100, 30000, 800, 0, AircraftType.A320);
+        // converging but tCPA >> 300 s
+        Aircraft a1 = new Aircraft("A1", 40.0, -75.0, 30000, 500, 180, AircraftType.A320);
+        Aircraft a2 = new Aircraft("A2", 30.0, -65.0, 30000, 500,   0, AircraftType.A320);
 
         List<Aircraft> aircrafts = Arrays.asList(a1, a2);
 
@@ -43,9 +43,9 @@ public class ConflictDetectorTest {
 
     @Test
     void shouldNotDetectConflictWhenAltitudeSeparated() {
-
-        Aircraft a1 = new Aircraft("A1", 0, 0, 30000, 800, 0, AircraftType.A320);
-        Aircraft a2 = new Aircraft("A2", 1, 1, 32000, 800, 0, AircraftType.A320);
+        // same geometry as close test but 2000 ft altitude difference
+        Aircraft a1 = new Aircraft("A1", 40.0, -75.0, 30000, 500, 180, AircraftType.A320);
+        Aircraft a2 = new Aircraft("A2", 39.8, -75.0, 32000, 500,   0, AircraftType.A320);
 
         List<Aircraft> aircrafts = Arrays.asList(a1, a2);
 
@@ -57,10 +57,10 @@ public class ConflictDetectorTest {
 
     @Test
     void shouldDetectMultipleConflicts() {
-
-        Aircraft a1 = new Aircraft("A1", 0, 0, 30000, 800, 0, AircraftType.A320);
-        Aircraft a2 = new Aircraft("A2", 1, 1, 30000, 800, 0, AircraftType.A320);
-        Aircraft a3 = new Aircraft("A3", 2, 2, 30000, 800, 0, AircraftType.A320);
+        // a1 heading east, a2 and a3 heading west — a1 converges with both
+        Aircraft a1 = new Aircraft("A1", 40.0, -75.0, 30000, 500,  90, AircraftType.A320);
+        Aircraft a2 = new Aircraft("A2", 40.0, -74.9, 30000, 500, 270, AircraftType.A320);
+        Aircraft a3 = new Aircraft("A3", 40.0, -74.8, 30000, 500, 270, AircraftType.A320);
 
         List<Aircraft> aircrafts = Arrays.asList(a1, a2, a3);
 

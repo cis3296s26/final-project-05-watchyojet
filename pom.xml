@@ -8,8 +8,6 @@
     <artifactId>WatchYoJet</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
-
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -48,7 +46,6 @@
          
     </dependencies>
 
-
     <build>
     <plugins>
 
@@ -59,16 +56,9 @@
             <version>0.0.8</version>
             <executions>
                 <execution>
-                    <!-- Default configuration for running with: mvn clean javafx:run -->
                     <id>default-cli</id>
                     <configuration>
-                        <mainClass>com.watchyojet/com.watchyojet.WYJApp</mainClass>
-                        <launcher>app</launcher>
-                        <jlinkZipName>app</jlinkZipName>
-                        <jlinkImageName>app</jlinkImageName>
-                        <noManPages>true</noManPages>
-                        <stripDebug>true</stripDebug>
-                        <noHeaderFiles>true</noHeaderFiles>
+                        <mainClass>com.watchyojet.WYJApp</mainClass>
                     </configuration>
                 </execution>
             </executions>
@@ -84,11 +74,50 @@
             </configuration>
         </plugin>
 
-        <!-- JUnit runner -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.1.2</version>
+        </plugin>
+
+        <!-- Executable jar -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.3.0</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>com.watchyojet.WYJApp</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
+
+        <!-- Fat jar (THIS is the important one) -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <archive>
+                    <manifest>
+                        <mainClass>com.watchyojet.WYJApp</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
         </plugin>
 
     </plugins>
